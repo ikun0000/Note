@@ -266,6 +266,154 @@ awk '{print $2,$5}' employee.txt
 
 
 
+#### 系统操作
+
+```
+df -k -h
+```
+
+显示文件系统的磁盘使用情况，默认情况下`df -k`将以字节为单位输出磁盘的使用量
+
+```
+passwd
+```
+
+`passwd`用于在命令行修改密码，使用这个命令会要求你先输入旧密码，然后输入新密码
+
+```
+passwd USERNAME
+```
+
+root用户使用这个命令修改其他用户的密码，这个时候不需要输入用户的密码
+
+```
+ifconfig -a
+```
+
+`ifconfig`用于查看和配置Linux系统的网络接口
+
+```
+ifconfig eth0 up|down
+```
+
+使用`up`和`down`命令启动或停止某个接口
+
+```
+uname -a
+```
+
+内核名称、主机名、内核版本号、处理器类型之类的信息
+
+```
+top
+```
+
+`top`命令会显示当前系统中占用资源最多的一些进程（默认以CPU占用率排序）如果你想改变排序方式，可以在结果列表中点击O（大写字母O）会显示所有可用于排序的列，这个时候你就可以选择你想排序的列
+
+```
+ps -ef | more
+```
+
+查看当前正在运行的所有进程
+
+```
+ps -efH | more
+```
+
+以树状结构显示当前正在运行的进程
+
+```
+top -u oracle
+```
+
+如果只想显示某个特定用户的进程，可以使用`-u`选项
+
+```
+free -g
+```
+
+如果你想以其他单位输出内存的使用量，需要加一个选项，`-g`为GB，`-m`为MB，`-k`为KB，`-b`为字节
+
+```
+free -t
+```
+
+如果你想查看所有内存的汇总，请使用`-t`选项，使用这个选项会在输出中加一个汇总行
+
+```
+shutdown -h now
+```
+
+关闭系统并立即关机
+
+```
+shutdown -h +10
+```
+
+10分钟后关机
+
+```
+shutdown -r now
+```
+
+重启
+
+```
+shutdown -Fr now
+```
+
+重启期间强制进行系统检查
+
+
+
+#### 其他操作
+
+```
+diff -w name_list.txt name_list_new.txt
+```
+
+比较的时候忽略空白行
+
+```
+export | grep ORACLE
+```
+
+输出跟字符串ORACLE匹配的环境变量
+
+```
+export ORACLE_HOME=/u01/app/oracle/product/10.2.0
+```
+
+设置全局环境变量
+
+```
+date -s "08/22/2017 23:59:53"
+```
+
+设置系统日期
+
+```
+hwclock --systohc -utc
+```
+
+当你修改了系统时间，需要同步硬件时间和系统时间
+
+```
+wget http://example.com/python3.5.2.tar.gz
+```
+
+使用`wget`从网上下载软件、音乐、视频
+
+```
+wget -O a.tar.gz http://example.com/python3.5.2.tar.gz
+```
+
+下载文件并以指定的文件名保存文件
+
+
+
+
+
 # 暴龙秘籍
 
 [暴龙秘籍](https://docs-old.fghrsh.net/bdsc_centos.html?page_id=1)
