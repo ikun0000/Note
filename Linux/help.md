@@ -414,7 +414,6 @@ wget -O a.tar.gz http://example.com/python3.5.2.tar.gz
 
 
 
-# 暴龙秘籍
+# 其他参考文章
 
 [暴龙秘籍](https://docs-old.fghrsh.net/bdsc_centos.html?page_id=1)
-
