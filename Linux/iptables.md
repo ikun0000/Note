@@ -103,7 +103,7 @@
 
 # echo 1 > /proc/sys/net/ipv4/ip_forward
 # iptables -A FORWARD -j ACCEPT
-# iptables -t nat -A PREROUTING -p tcp -d 57.11.22.33 --dport 80 -j DNAT 192.168.1.1:8080
+# iptables -t nat -A PREROUTING -p tcp -d 57.11.22.33 --dport 80 -j DNAT --to-destination 192.168.1.1:8080
 //将http流量重定向到别的地方，目标端口是8080
 
 # echo 1 > /proc/sys/net/ipv4/ip_forward
