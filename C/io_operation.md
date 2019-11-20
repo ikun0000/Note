@@ -1,5 +1,58 @@
 # 文件操作
 
+### 重要的事情说三遍
+
+***写完open立刻写close***
+
+***写完open立刻写close***
+
+***写完open立刻写close***
+
+***写完opendir立刻写closedir***
+
+***写完opendir立刻写closedir***
+
+***写完opendir立刻写closedir***
+
+
+
+### 文件描述符
+
+就是一个数字，每个数字代表一个打开的文件
+
+Linux默认打开一个终端就会打开3个文件描述符STDIN_FILENO（0）、STDOUT_FILENO（1）、STDERR_FILENO（2）
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <fcntl.h>
+
+int main()
+{
+    int fd;
+
+    fd = open("test.txt", O_CREAT | O_EXCL | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP);
+
+    if (fd < 0)
+    {
+        fprintf(stderr, "open(2) error\n");
+        return -1;
+    }
+    dup2(fd, fileno(stdout));
+    printf("aaaaaaaaaaaaaaaaaaaaaa\n");
+	
+    close(fd);
+    return 0;
+}
+```
+
+例子使用`dup2(2)`来指定把fd复制到**标准输出**的文件描述符，此后**标准输出**就指向fd打开的文件，对`stdout`的操作实际上都是对fd操作（[dup(2)](http://man7.org/linux/man-pages/man2/dup.2.html)）
+
+`dup(2)`是有系统自动分配最小可用描述符，而`dup2(2)`则是自己指定描述符
+
+
+
 ### 文件创建/读写
 
 弱化版`cp(1)`
@@ -37,7 +90,9 @@ int main(int argc, char *argv[])
     {
         write(outfd, block, nread);
     }
-
+	
+    close(infd);
+    close(outfd);
     return 0;
 }
 ```
@@ -51,6 +106,8 @@ open(2)成功返回非负整数，失败返回负数并设置`errno`
 之后通过`write(2)`向指定文件描述符输出（[write(2)]( http://man7.org/linux/man-pages/man2/write.2.html )）
 
 close(2)关闭一个文件描述符（[close(2)]( http://man7.org/linux/man-pages/man2/close.2.html )）
+
+
 
 常用的`flags`和`mode`组合
 
@@ -97,7 +154,8 @@ int main(int argc, char *argv[])
     {
         write(STDOUT_FILENO, block, nread);
     }
-
+	
+    close(fd);
     return 0;
 }
 ```
@@ -234,6 +292,107 @@ int main(int argc, char *argv[])
 `lstat(2)`和`stat(2)`在传入的文件不是**符号链接**的时候的执行效果是一样的，当传入的文件名是**符号链接**时，`stat(2)`会返回**符号链接**指向的文件的文件信息，而`lstat(2)`返回的则是符号链接本身的信息
 
 顺便在说说时间问题，C语言有标准库处理时间（[time(2)]( http://man7.org/linux/man-pages/man2/time.2.html )、[difftime(3)]( http://man7.org/linux/man-pages/man3/difftime.3.html )、[gmtime(3)]( http://man7.org/linux/man-pages/man3/gmtime.3p.html )、[localtime(3)]( http://man7.org/linux/man-pages/man3/localtime.3p.html )、[mktime(3)]( http://man7.org/linux/man-pages/man3/mktime.3p.html )、[ctime(3)]( http://man7.org/linux/man-pages/man3/mktime.3.html )、[asctime(3)]( http://man7.org/linux/man-pages/man3/asctime.3p.html )、[strftime(3)]( http://man7.org/linux/man-pages/man3/strftime.3.html )、[strptime(3)]( http://man7.org/linux/man-pages/man3/strptime.3.html )）
+
+
+
+### 其他文件和目录操作
+
+1. 修改文件的属主和属组
+
+   [chown(2)](http://man7.org/linux/man-pages/man2/chown.2.html)
+
+2. 修改文件的属主和属组
+
+   [chmod(2)](http://man7.org/linux/man-pages/man2/chmod.2.html)
+
+3. 创建/删除文件链接
+
+   [link(2)](http://man7.org/linux/man-pages/man2/link.2.html)、[symlink(2)](http://man7.org/linux/man-pages/man2/symlink.2.html)、[unlink(2)](http://man7.org/linux/man-pages/man2/unlink.2.html)
+
+   `link(2)`用于创建一个硬链接，之后修改硬链接不会影响到原来文件，每创建一次硬链接`stat->st_nlink`就会增加1
+
+   `symlink(2)`会创建一个符号链接，符号链接指向源文件，符号链接的大小就是源文件文件名的长度
+
+   `unlink(2)`删除一个文件链接，在删除一个文件时`stat->st_nlink`会减1，要真正删除文件在磁盘的记录必须是要`stat->st_nlink`为0
+
+4. 创建/删除目录
+
+   [mkdir(3)](http://man7.org/linux/man-pages/man3/mkdir.3p.html)
+
+   [rmdir(3)](https://linux.die.net/man/3/rmdir)
+
+5. 获取/切换目录
+
+   [getcwd(2)](http://man7.org/linux/man-pages/man2/getcwd.2.html)
+
+   [chdir(3)](http://man7.org/linux/man-pages/man3/chdir.3p.html)
+
+   
+
+### 目录扫描
+
+弱化版`ls(1)`
+
+```c
+#include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    DIR *dir;
+    struct dirent *entry;
+
+    if (argc != 2)
+    {
+        printf("usage: a.out <dirpath>\n");
+        return 0;
+    }
+    
+    if ((dir = opendir(argv[1])) == NULL)
+    {
+        fprintf(stderr, "opendir(3) error\n");
+        return -1;
+    }
+   
+    printf("inode\tname\n");
+    while ((entry = readdir(dir)) != NULL)
+    {
+        printf("%ld\t%s\n", entry->d_ino, entry->d_name);
+    }
+
+    closedir(dir);
+    return 0;
+}
+```
+
+首先`opendir(3)`打开目录，然后`readdir(3)`遍历目录，返回一个`struct dirent`结构，最后关闭目录（[opendir(3)](http://man7.org/linux/man-pages/man3/readdir.3.html)、[readdir(3)](http://man7.org/linux/man-pages/man3/readdir.3.html)、[closedir(3)](http://man7.org/linux/man-pages/man3/closedir.3.html)）
+
+​	
+
+### 感觉用的不多的文件操作
+
+1. 文件同步
+
+   [sync(2)](http://man7.org/linux/man-pages/man2/sync.2.html)、[fsync(2)](http://man7.org/linux/man-pages/man2/fdatasync.2.html)
+
+2. 文件截断
+
+   [truncate(3)](http://man7.org/linux/man-pages/man3/truncate.3p.html)、[ftruncate(3)](http://man7.org/linux/man-pages/man3/ftruncate.3p.html)
+   
+3. 获取/移动当前目录指针
+
+   [telldir(3)](http://man7.org/linux/man-pages/man3/telldir.3.html)、[seekdir(3)](http://man7.org/linux/man-pages/man3/seekdir.3.html)
+
+
+
+### 标准IO
+
+C语言提供的更高级的IO操作
+
+参考：[菜鸟教程 C 标准库 - <stdio.h>](https://www.runoob.com/cprogramming/c-standard-library-stdio-h.html)
 
 
 
