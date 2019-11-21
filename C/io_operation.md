@@ -8,6 +8,12 @@
 
 ***写完open立刻写close***
 
+***写完fopen立刻写fclose***
+
+***写完fopen立刻写fclose***
+
+***写完fopen立刻写fclose***
+
 ***写完opendir立刻写closedir***
 
 ***写完opendir立刻写closedir***
@@ -50,6 +56,14 @@ int main()
 例子使用`dup2(2)`来指定把fd复制到**标准输出**的文件描述符，此后**标准输出**就指向fd打开的文件，对`stdout`的操作实际上都是对fd操作（[dup(2)](http://man7.org/linux/man-pages/man2/dup.2.html)）
 
 `dup(2)`是有系统自动分配最小可用描述符，而`dup2(2)`则是自己指定描述符
+
+除了使用`dup(2)`复制文件描述符以外，还可以使用`fcntl(2)`复制文件描述符（[fcntl(2)]( http://man7.org/linux/man-pages/man2/fcntl.2.html )）
+
+```
+fcntl(fd, F_DUPFD, newfd); 
+```
+
+这样相当于`dup2(fd, newfd)`，但是不同的是`fcntl(2)`会返回一个新的描述符，这个描述符的值大于等于`newfd`的值
 
 
 
@@ -372,6 +386,252 @@ int main(int argc, char *argv[])
 
 ​	
 
+### 标准I/O
+
+C语言提供的更高级的IO操作
+
+参考：[菜鸟教程 C 标准库 - <stdio.h>](https://www.runoob.com/cprogramming/c-standard-library-stdio-h.html)
+
+
+
+### 非阻塞I/O
+
+```c
+int fd = open("test.txt", O_RDWR | O_NONBLOCK);
+```
+
+只要在`flags`标志添加`O_NONBLOCK`打开的文件就处于非阻塞I/O
+
+
+
+### 存储映射I/O
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+
+#define COUNT   100
+
+typedef struct {
+    int id;
+    char name[10];
+} student;
+
+int main()
+{
+    FILE *f;
+    int fd;
+    student *pstu;
+    student stu;
+    int i;
+
+    f = fopen("test.txt", "w");
+
+    for (i = 0; i < COUNT; i++)
+    {
+        stu.id = i + 1;
+        sprintf(stu.name, "TEST");
+        fwrite(&stu, sizeof(student), 1, f);
+    }
+    fclose(f);
+
+
+    fd = open("test.txt", O_RDWR);
+    pstu = (student *)mmap(0, COUNT * sizeof(student), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    pstu[50].id = 1000;
+    sprintf(pstu[50].name, "NONONO");
+    msync(pstu, COUNT * sizeof(student), MS_SYNC);
+    munmap(pstu, COUNT * sizeof(student));
+    close(fd);
+
+    f = fopen("test.txt", "r");
+    fseek(f, 50 * sizeof(student), SEEK_SET);
+    fread(&stu, sizeof(student), 1, f);
+    printf("id: %d; name: %s\n", stu.id, stu.name);
+    fclose(f);
+
+    return 0;
+}
+```
+
+例子中通过`mmap(2)`把文件描述符映射到由系统随机分配的内存上面，然后只需要对内存做读写操作，就相当于对文件进行读写操作（[mmap(2)]( http://man7.org/linux/man-pages/man2/mmap.2.html )、[msync(2)]( http://man7.org/linux/man-pages/man2/msync.2.html )、[munmap(2)]( http://man7.org/linux/man-pages/man2/mmap.2.html )）
+
+
+
+### 文件锁
+
+设置文件锁
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+
+#define COUNT   100
+
+typedef struct {
+    int id;
+    char name[10];
+} student;
+
+int main()
+{
+    FILE *f;
+    int fd;
+    student *pstu;
+    student stu;
+    int i;
+
+    f = fopen("test.txt", "w");
+
+    for (i = 0; i < COUNT; i++)
+    {
+        stu.id = i + 1;
+        sprintf(stu.name, "TEST");
+        fwrite(&stu, sizeof(student), 1, f);
+    }
+    fclose(f);
+
+
+    fd = open("test.txt", O_RDWR);
+    pstu = (student *)mmap(0, COUNT * sizeof(student), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    pstu[50].id = 1000;
+    sprintf(pstu[50].name, "NONONO");
+    msync(pstu, COUNT * sizeof(student), MS_SYNC);
+    munmap(pstu, COUNT * sizeof(student));
+    close(fd);
+
+    f = fopen("test.txt", "r");
+    fseek(f, 50 * sizeof(student), SEEK_SET);
+    fread(&stu, sizeof(student), 1, f);
+    printf("id: %d; name: %s\n", stu.id, stu.name);
+    fclose(f);
+
+    return 0;
+}
+```
+
+检查文件锁
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+int main()
+{
+    int fd;
+    struct flock get_lock;
+
+    if ((fd = open("test.txt", O_RDWR)) < 0)
+    {
+        fprintf(stderr, "open(2) error\n");
+        return -1;
+    }
+
+    get_lock.l_type = F_RDLCK;
+    get_lock.l_len = 26;
+    get_lock.l_whence = SEEK_SET;
+    get_lock.l_start = 0;
+    get_lock.l_pid = -1;
+    if (fcntl(fd, F_GETLK, &get_lock) == -1)
+    {
+        fprintf(stderr, "fcntl(2) error\n");
+        return -2;
+    }
+    if (get_lock.l_pid != -1)
+    {
+        printf("from 0 to 26 can't get F_RDLCK\n");
+    }
+    else 
+    {
+        printf("from 0 to 26 can get F_RDLCK\n");
+    }
+
+    get_lock.l_type = F_WRLCK;
+    get_lock.l_len = 26;
+    get_lock.l_whence = SEEK_SET;
+    get_lock.l_start = 0;
+    get_lock.l_pid = -1;
+    if (fcntl(fd, F_GETLK, &get_lock) == -1)
+    {
+        fprintf(stderr, "fcntl(2) error\n");
+        return -2;
+    }
+    if (get_lock.l_pid != -1)
+    {
+        printf("from 0 to 26 can't get F_WRLCK\n");
+    }
+    else 
+    {
+        printf("from 0 to 26 can get F_WRLCK\n");
+    }
+
+    get_lock.l_type = F_RDLCK;
+    get_lock.l_len = 26;
+    get_lock.l_whence = SEEK_SET;
+    get_lock.l_start = 26;
+    get_lock.l_pid = -1;
+    if (fcntl(fd, F_GETLK, &get_lock) == -1)
+    {
+        fprintf(stderr, "fcntl(2) error\n");
+        return -2;
+    }
+    if (get_lock.l_pid != -1)
+    {
+        printf("from 26 to 52 can't get F_RDLCK\n");
+    }
+    else 
+    {
+        printf("from 26 to 52 can get F_RDLCK\n");
+    }
+
+    get_lock.l_type = F_WRLCK;
+    get_lock.l_len = 26;
+    get_lock.l_whence = SEEK_SET;
+    get_lock.l_start = 26;
+    get_lock.l_pid = -1;
+    if (fcntl(fd, F_GETLK, &get_lock) == -1)
+    {
+        fprintf(stderr, "fcntl(2) error\n");
+        return -2;
+    }
+    if (get_lock.l_pid != -1)
+    {
+        printf("from 26 to 52 can't get F_WRLCK\n");
+    }
+    else 
+    {
+        printf("from 26 to 52 can get F_WRLCK\n");
+    }
+
+    return 0;
+}
+```
+
+执行过程
+
+```
+# ./a.out &
+# ./b.out
+from 0 to 26 can't get F_RDLCK
+from 0 to 26 can't get F_WRLCK
+from 26 to 52 can get F_RDLCK
+from 26 to 52 can't get F_WRLCK
+```
+
+当在一个地方设置了共享（读）锁，那么在这块地方也是可以获取共享锁，而不能设置独占（写）锁。当在一个地方设置了独占锁，那么在这里无论独占锁还是共享锁都不可以设置
+
+使用`F_GETLK`获取锁信息的时候，可以把`flock.l_pid`设置为-1，函数执行完后检查这个字段，如何可以在`flock`指定的位置设置指定的锁，那么`flock.l_pid`的值不会改变，如果不可以设置锁，则`flock.l_pid`会被设置为拥有这块地方的锁的进程ID，一般用这种方法判断在某个地方是否可以设置锁
+
+
+
 ### 感觉用的不多的文件操作
 
 1. 文件同步
@@ -381,18 +641,22 @@ int main(int argc, char *argv[])
 2. 文件截断
 
    [truncate(3)](http://man7.org/linux/man-pages/man3/truncate.3p.html)、[ftruncate(3)](http://man7.org/linux/man-pages/man3/ftruncate.3p.html)
-   
+
 3. 获取/移动当前目录指针
 
    [telldir(3)](http://man7.org/linux/man-pages/man3/telldir.3.html)、[seekdir(3)](http://man7.org/linux/man-pages/man3/seekdir.3.html)
 
+4. 检查用户对文件的权限
 
+   [access(2)]( http://man7.org/linux/man-pages/man2/access.2.html )
 
-### 标准IO
+5. 获取文件流的文件描述符
 
-C语言提供的更高级的IO操作
+   [fileno(3)]( http://man7.org/linux/man-pages/man3/fileno.3p.html )
 
-参考：[菜鸟教程 C 标准库 - <stdio.h>](https://www.runoob.com/cprogramming/c-standard-library-stdio-h.html)
+6. 查看/修改打开文件的`flags`，使用`fcntl(2)`的`F_GETFL` ` F_SETFL` 命令，**但是不是所有标志都可以设置**
+
+   [fcntl(2)]( http://man7.org/linux/man-pages/man2/fcntl.2.html )
 
 
 
