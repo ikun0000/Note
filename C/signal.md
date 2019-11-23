@@ -113,6 +113,8 @@ int main(int argc, char *argv[])
 
 `alarm(2)`则可以在每隔一段时间向自己发送`SIGALRM`信号（[alarm(2)]( http://man7.org/linux/man-pages/man2/alarm.2.html )）
 
+`raise(3)`向调用者发送信号（[raise(3)](http://man7.org/linux/man-pages/man3/raise.3.html)）
+
 
 
 ### 使用`sigaction`
