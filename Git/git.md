@@ -5,6 +5,8 @@
 ## 参考
 
 > [廖学峰官方网站](https://www.liaoxuefeng.com/wiki/896043488029600)
+>
+> [工作中 99% 能用到的 Git 命令](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247487283&idx=2&sn=0e726185ef62f04f3510b19f77e360ef&chksm=9bed2e41ac9aa757923892cffff3de6cf81b9c266227cf8a560c9c40371560674688ec8100dc&scene=0&xtrack=1#rd)
 
 
 
