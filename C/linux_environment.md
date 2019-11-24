@@ -504,3 +504,45 @@ GCC编译
 `getpriority(2)`和`setpriority(2)`获取和设置进程、进程组、用户的优先级（[getpriority(2)]( http://man7.org/linux/man-pages/man2/getpriority.2.html )、[setpriority(2)]( http://man7.org/linux/man-pages/man2/getpriority.2.html )）
 
 `getrlimit(2)`和`setrlimit(2)`则获取和设置系统诸如内核存储文件大小、CPU限制、数据段限制、文件大小、可打开文件数、栈空间大小、地址空间的限制（[getrlimit(2)]( http://man7.org/linux/man-pages/man2/getrlimit.2.html )、[setrlimit(2)]( http://man7.org/linux/man-pages/man2/getrlimit.2.html )）
+
+
+
+### 主机名/错误处理
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+
+int main(int argc, char *argv[])
+{
+    char buffer[100];
+
+    if (argc == 1)
+    {
+        if (gethostname(buffer, 100) < 0)
+        {
+            perror("gethostname(2) error");
+            exit(1);
+        }
+        printf("%s\n", buffer);
+    }
+    else
+    {
+        if (sethostname(argv[1], strlen(argv[1])) < 0)
+        {
+            fprintf(stderr, "Error: %d\nReason: %s\n", errno, strerror(errno));
+            exit(1);
+        }
+    }
+
+    return 0;
+}
+```
+
+`gethostname(2)`和`sethostname(2)`获取和设置主机名（[gethostname(3)](http://man7.org/linux/man-pages/man3/gethostname.3p.html)、[sethostname(3)](https://linux.die.net/man/2/sethostname)）
+
+`errno`在发生错误的时候会被设置错误号，`perror(3)`输出错误信息，`strerror(3)`根据错误码返回对应的说明字符串（[perror(3)](http://man7.org/linux/man-pages/man3/perror.3.html)、[strerror(3)](http://man7.org/linux/man-pages/man3/strerror.3.html)）
+
