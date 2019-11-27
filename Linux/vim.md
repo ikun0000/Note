@@ -1,5 +1,13 @@
 # VIM配置和常用命令
 
+
+
+![](./img/vim1.gif)
+
+
+
+![](./img/vim2.png)
+
 ## 安装vimplus
 
 项目地址：` https://github.com/chxuan/vimplus `
