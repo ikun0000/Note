@@ -217,3 +217,17 @@ normal模式下复制粘贴分别使用`y`(yank)和`p`(put)，剪贴用`d`和`p`
 `<ctrl+x><ctrl+f>`执行文件名补全
 
 在补全的时候`<ctrl+n>`和`<ctrl+p>`可以上下选择
+
+
+
+### VIM配色
+
+在normal模式下执行`:colorscheme`显示主题配色，默认为default
+
+用`:colorscheme <ctrl+d>`可以显示所有颜色
+
+用`:colorscheme 配色名`可以修改配色
+
+更多vim配色方案[https://github.com/flazz/vim-colorschemes](https://github.com/flazz/vim-colorschemes)
+
+这个好看[https://github.com/w0ng/vim-hybrid](https://github.com/w0ng/vim-hybrid)
