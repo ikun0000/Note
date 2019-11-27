@@ -14,12 +14,6 @@
 
 根据README.md文件安装配置即可，使用不同版本的vimplus的插件配置文件也可能不同，具体到时候看README.md文件
 
-我的常用配置
-
-```
-
-```
-
 
 
 安装完vimplus之后一般YouCompleteMe是用不了的，要先删掉它原来的然后自行安装，安装方法按照README.md做就可以了
@@ -27,6 +21,17 @@
 
 
 ## vim使用方法
+
+### text object
+
+normal模式命令格式
+
+```
+[number]<command>[text object] 
+```
+
+
+
 ### 基本操作
 
 normal模式进入insert模式，`i`(insert)，使用这个在字符前面插入、`a`(append)，他会在字符后面插入、`a`是在当前字符的后面插入，`o`(open a line below)，`o`的话会在当前行的下一行插入
@@ -127,3 +132,88 @@ subsitute命令查找并替换文本，而且支持正则表达式
   * g(global)表示全局范围内执行
   * c(confirm)表示确认，可以确认或者拒绝修改
   * n(number)报告匹配到的次数而不替换，可以用来查询匹配次数
+
+
+
+### VIM多文件操作
+
+在normal模式下使用`:e {filename}`打开编辑文件
+
+在每打开一个文件都会生成这个文件的缓冲区，使用`:ls`列举当前的缓冲区，使用`:b {n}`跳转到第n个缓冲区，使用`:bn`跳转到下一个缓冲区，使用`:bp`跳转到上一个缓冲区，`:bf` `:bl`分别跳转到第一和最后一个缓冲区，也可以跟buffer名，一般就是文件名来跳转
+
+
+
+如果要同时打开多个文件，使用`<ctrl+w>s`水平分割，`<ctrl+w>v`垂直分割，或者在normal模式下执行`:sp` 和 `:vs`
+
+使用`<ctrl+w>w`在窗口间循环切换，使用`<ctrl+w>[hjkl]`在窗口间向左、下、上、右切换
+
+使用`<ctrl+w>[HJKL]`将窗口向左、下、上、右移动
+
+`<ctrl+w>=`使所有窗口等宽登高
+
+`<ctrl+w>_`最大化活动窗口的高度
+
+`<ctrl+w>|`最大化活动窗口的宽度
+
+`[N]<ctrl+w>_`设置活动窗口高度为N行
+
+`[N]<ctrl+w>|`设置活动窗口宽度为N行
+
+
+
+VIM还可以打开多个tab页，在command模式下`:tabnew [tabname]`打开新的标签页，`:tabn[ext] [n]`切换到下一个或者第n个标签页（normal模式命令是`gt` `{N}gt`），`:tabp[revious]`切换到上一页标签页（normal模式命令是`gT`）
+
+
+
+### VIM复制粘贴与寄存器
+
+normal模式下复制粘贴分别使用`y`(yank)和`p`(put)，剪贴用`d`和`p`
+
+或者使用`v`(visual)命令选中所要复制的地方，然后使用`p`粘贴
+
+
+
+如果在command模式下或者`.vimrc`设置了`set autoindent`在粘贴像python这种使用缩进表示代码块的代码的时候缩进会混乱，这时候在command模式下执行`:set paste`，完成之后想恢复原样再执行`:set nopaste`
+
+
+
+一般不指定寄存器用的是默认的”无名寄存器“（无名寄存器用`""`表示）
+
+通过`"{register}`前缀可以指定寄存器
+
+```
+"ayy		// 把光标所在行复制到a寄存器里面
+"ap			// 使用a寄存器的内容put
+"bdd		// 把光标所在行的内容放到b寄存器里面
+"bp			// 使用b寄存器的内容put
+```
+
+在normal模式下执行`: reg {register}`查看寄存器的内容
+
+系统剪贴板使用`+`表示，或者设置`set clipboard=unnamed`可以复制粘贴系统剪贴板的内容（**在normal模式下执行`:echo has('clipboard')`输出1才支持**）
+
+
+
+在insert模式下按下`<ctrl+r>{register}`在insert模式下粘贴寄存器内容
+
+
+
+### VIM宏（macro）
+
+在normal模式下使用`q{register}`来开始录制命令，之后就可以执行你要的命令，最后回到normal模式按下`a`结束录制
+
+要调用这个宏，在normal模式下执行`@{register}`
+
+在visual模式下执行normal模式命令，在命令前面加上`normal`前缀就可以执行normal模式的命令
+
+
+
+### VIM补全大法
+
+在insert模式下按下`ctrl+n`执行普通的补全
+
+`<ctrl+x><ctrl+o>`执行全能（omni）补全
+
+`<ctrl+x><ctrl+f>`执行文件名补全
+
+在补全的时候`<ctrl+n>`和`<ctrl+p>`可以上下选择
