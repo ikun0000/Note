@@ -8,16 +8,6 @@
 
 ![](./img/vim2.png)
 
-## 安装vimplus
-
-项目地址：` https://github.com/chxuan/vimplus `
-
-根据README.md文件安装配置即可，使用不同版本的vimplus的插件配置文件也可能不同，具体到时候看README.md文件
-
-
-
-安装完vimplus之后一般YouCompleteMe是用不了的，要先删掉它原来的然后自行安装，安装方法按照README.md做就可以了
-
 
 
 ## vim使用方法
@@ -231,3 +221,108 @@ normal模式下复制粘贴分别使用`y`(yank)和`p`(put)，剪贴用`d`和`p`
 更多vim配色方案[https://github.com/flazz/vim-colorschemes](https://github.com/flazz/vim-colorschemes)
 
 这个好看[https://github.com/w0ng/vim-hybrid](https://github.com/w0ng/vim-hybrid)
+
+
+
+### VIM持久化配置
+
+在用户家目录创建一个`.vimrc`文件
+
+```
+set nu
+syntax on
+set autoindent
+set cindent
+set background=dark
+colorscheme hybrid
+set ts=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+```
+
+`.vimrc`映射快捷键
+
+```    
+let mapleader=','				" 设置leader
+inoremap <leader>w <Esc>:w<cr>	“ 执行,n就相当于保存
+inoremap jj <Esc>				" 按下jj进入normal模式
+" 使用ctrl+hjkl执行normal模式下hjkl
+inoremap <C-h> <C-w>h
+inoremap <C-j> <C-w>j
+inoremap <C-k> <C-w>k
+inoremap <C-l> <C-w>l
+```
+
+自定义函数SetTitle，自动插入文件头
+
+```
+func SetTitle()
+	if &filetype == 'python'
+		call setline(1, "\#!/usr/bin/env python")
+		call setline(2, "\# -*- coding:utf-8 -*-")
+		normal G
+		normal o
+		normal o
+		call setline(5, "if __name__ == '__main__':")
+		call setline(6, "	pass")
+	endif
+endfun
+```
+
+
+
+### VIM映射
+
+#### 基本映射
+
+使用`-`代替`x`
+
+```
+map - x
+```
+
+使用空格选中一个单词
+
+```
+map <space> viw
+```
+
+要取消映射使用`:unmap {映射字符}`取消映射
+
+
+
+#### 模式映射
+
+用`nmap/vmap/imap`定义映射只在normal/visual/insert分别有效
+
+比如在visual模式下选中单词按下`\`转换大小写`:vmap \ U` `:vmap \ u`（U是大写，u是小写）
+
+
+
+#### 非递归映射
+
+使用`*map`对应的`nnoremap/vnoremap/inoremap`不会递归解释映射
+
+
+
+### VIM插件安装
+
+vim-plug
+
+[ https://github.com/junegunn/vim-plug ]( https://github.com/junegunn/vim-plug )
+
+按照官方文档安装即可
+
+然后把Example配置里的东西复制到自己的`.vimrc`
+
+[寻找插件]( https://vimawesome.com/ )
+
+
+
+我的插件：
+
+// TODO
+
+
+
