@@ -296,6 +296,40 @@ map <space> viw
 
 
 
+习惯hjkl
+
+```
+imap <Up> <Nop>
+map <Up> <Nop>
+
+imap <Down> <Nop>
+map <Down> <Nop>
+
+imap <Left> <Nop>
+map <Left> <Nop>
+
+imap <Right> <Nop>
+map <Right> <Nop>
+```
+
+这样就可以屏蔽上下左右了（强行使用hjkl）
+
+
+
+让Esc更舒服
+
+```
+imap jk <Esc>
+```
+
+这样就可以使用jk就进入normal模式，或者
+
+```
+imap jj <Esc11>
+```
+
+
+
 #### 模式映射
 
 用`nmap/vmap/imap`定义映射只在normal/visual/insert分别有效
