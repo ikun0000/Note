@@ -31,16 +31,16 @@
 
 ```
 Maven project
-	src										// Maven项目的源代码
-	|	main								// 这个下面放项目代码
-	|	|	java
-	|	|	|	Your packages
-	|	test								// 这个下面是测试代码
-	|	|	java
-	|	|	|	Your packages
-	|	resource							// 这里存放资源文件
-	target									// compile、package之后的东西
-	pom.xml									// Maven项目的配置文件
+|	src										// Maven项目的源代码
+|	|	main								// 这个下面放项目代码
+|	|	|	java
+|	|	|	|	Your packages
+|	|	test								// 这个下面是测试代码
+|	|	|	java
+|	|	|	|	Your packages
+|	|	resource							// 这里存放资源文件
+|	target									// compile、package之后的东西
+|	pom.xml									// Maven项目的配置文件
 ```
 
 
@@ -234,7 +234,7 @@ Maven project
 
 `<optional></optional>`表示依赖是否可选，默认是false，如果是false子项目默认是继承的，如果是true子项目必须显示引入依赖
 
-`<exclusions><exclusion></exclusion></exclusions>`用来取消传递依赖，比如A依赖B，B依赖C，C对A来说就是传递依赖，如果A不想依赖C就是用这个标签
+`<exclusions><exclusion></exclusion></exclusions>`用来取消传递依赖，比如A依赖B，B依赖C，C对A来说就是传递依赖，如果A不想依赖C就在A中用这个标签exclude掉C的坐标
 
 
 
