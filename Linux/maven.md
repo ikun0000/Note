@@ -167,6 +167,7 @@ Maven project
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -229,7 +230,7 @@ Maven project
 
 之后使用`<dependencies></dependencies>`来描述依赖列表，在里面使用`<dependency></dependency>`来指定每一个依赖，通常每个`<dependency></dependency>`包含`<groupId></groupId>`  `<artifactId></artifactId>`  `<version></version>` 就是写一个Maven项目是最开始写的那些
 
-还有`<type></type>` `<scope></scope>`表示依赖的范围，比如写了`test`就表示这个依赖只在test下有用，在main下会报错
+还有`<type></type>` `<scope></scope>`表示依赖的范围，比如写了`test`就表示这个依赖只在test下有用，在main下会报错，`system` `provided`在编译测试时有效，后者会和本机系统关联，可移植性差，`import`是导入范围
 
 `<optional></optional>`表示依赖是否可选，默认是false，如果是false子项目默认是继承的，如果是true子项目必须显示引入依赖
 
