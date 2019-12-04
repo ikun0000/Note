@@ -12,7 +12,7 @@
 
 ### 设置Maven远程仓库为Aliyun仓库
 
-在`MAVEN_HOME`目录下的conf目录下的settings.xml文件中找到mirrors那一块（默认是注释）在那个位置加上下面这个
+在`MAVEN_HOME`目录下的conf目录下的settings.xml文件中找到mirrors那一块（默认是注释）在那个位置加上下面这个，复制`<mirrors></mirrors>`里面的就行，**加s的代表镜像源集合，不加s的就是其中一个镜像源，下面有好多标签类似这样**
 
 ```
 <mirrors>
@@ -31,16 +31,19 @@
 
 ```
 Maven project
-|	src										// Maven项目的源代码
-|	|	main								// 这个下面放项目代码
-|	|	|	java
-|	|	|	|	Your packages
-|	|	test								// 这个下面是测试代码
-|	|	|	java
-|	|	|	|	Your packages
-|	|	resource							// 这里存放资源文件
-|	target									// compile、package之后的东西
-|	pom.xml									// Maven项目的配置文件
+|	Artifact01									// 表示artifactId
+|	|	src										// Maven项目的源代码
+|	|	|	main								// 这个下面放项目代码
+|	|	|	|	java
+|	|	|	|	|	pkg							// 这里就是按着groupId起包了
+|	|	|	test								// 这个下面是测试代码
+|	|	|	|	java
+|	|	|	|	|	pkg
+|	|	|	resource							// 这里存放资源文件
+|	|	target									// compile、package之后的东西
+|	|	pom.xml									// Maven项目的配置文件
+|	Artifact02
+|	|
 ```
 
 
@@ -206,10 +209,10 @@ Maven project
 > `<artifactId></artifactId>项目名+模块名</artifactId>`标识了项目的模块
 > `<version></version>`标识了当前的版本号，它由三个点分的数字表示，第一个数字表示大版本号，第二个数字表示分支版本号，第三个数字表示小版本号，小版本号也可以写成
 >
-> * snapshot 快照
-> * alpha 内部测试
-> * beta 公测
-> * release 稳定
+> * SNAPSHOT 快照
+> * ALPHA 内部测试
+> * BETA 公测
+> * RELEASE 稳定
 > * GA 正式发布
 >
 > `<packaging></packaging>`代表Maven默认的打包方式，默认是jar
@@ -228,6 +231,26 @@ Maven project
 
 
 
+`<properties></properties>`里面定义的标签后面可以通过`${...}`来引用，比如：
+
+```
+<properties>
+	<junit.version>4.10</junit.version>
+</properties>
+
+<dependencies>
+	<dependency>
+    	<groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+</dependencies>
+```
+
+
+
 之后使用`<dependencies></dependencies>`来描述依赖列表，在里面使用`<dependency></dependency>`来指定每一个依赖，通常每个`<dependency></dependency>`包含`<groupId></groupId>`  `<artifactId></artifactId>`  `<version></version>` 就是写一个Maven项目是最开始写的那些
 
 还有`<type></type>` `<scope></scope>`表示依赖的范围，比如写了`test`就表示这个依赖只在test下有用，在main下会报错，`system` `provided`在编译测试时有效，后者会和本机系统关联，可移植性差，`import`是导入范围
@@ -238,7 +261,7 @@ Maven project
 
 
 
-`<dependencyManagement></dependencyManagement>`是依赖管理，里面的`<dependency></dependency>`
+`<dependencyManagement></dependencyManagement>`是依赖管理，里面的`<dependency></dependency>`，依赖的包并不会在本项目执行
 
 
 
@@ -252,9 +275,23 @@ Maven project
 
 `<modules></modules>`用来聚合多个运行的Maven项目，里面使用`<module></module>`
 
+聚合项目：
+
+```
+<modules>
+	<module>../artifactId-001</module>
+	<module>../artifactId-002</module>
+	<module>../articleId-003</module>
+</modules>
+```
 
 
-## IDEA运行Maven程序
+
+
+
+## Errors
+
+### IDEA运行Maven程序
 
 如果运行提示
 
@@ -271,4 +308,26 @@ Error: java error: release version 5 not supported
 7. 搞定
 
 参考链接：[https://blog.csdn.net/qq_22076345/article/details/82392236](https://blog.csdn.net/qq_22076345/article/details/82392236)
+
+
+
+### 命令行运行Maven程序
+
+如果运行提示
+
+```
+Error: java error: release version 5 not supported
+```
+
+在`<project></project>`里面加上下面这段配置，让他使用JDK1.8
+
+```
+<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+   </properties> 
+```
 
