@@ -1,5 +1,134 @@
 # SpringBean配置
 
+### 添加依赖
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.czk</groupId>
+  <artifactId>springannotation</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>springannotation</name>
+  <!-- FIXME change it to the project's website -->
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>5.2.2.RELEASE</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>5.2.2.RELEASE</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-beans -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>5.2.2.RELEASE</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>5.2.2.RELEASE</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api -->
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.3.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/javax.inject/javax.inject -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
+
+```
+
+
+
+
+
 
 
 ### XML配置Bean
@@ -148,8 +277,6 @@ public class AppTest {
 
 
 
-
-
 #### 继承关系的Bean的配置
 
 在上面的基础上加多一个类继承People类
@@ -264,6 +391,38 @@ public class HumanFactory {
 
 
 
+#### 动态工厂初始化Bean
+
+创建动态工厂
+
+```java
+package org.czk;
+
+import java.util.List;
+
+public class HumanFactory {
+
+    public People getPeople() {
+        return new People("aaa", 100);
+    }
+
+    public Student getStudent() {
+        return new Student("bbb", 22, "22222222");
+    }
+
+}
+```
+
+xml配置
+
+```xml
+<bean id="factory" class="org.czk.HumanFactory"></bean>
+<bean id="peoplepeople" factory-bean="factory" factory-method="getPeople"></bean>
+<bean id="studentstudent" factory-bean="factory" factory-method="getStudent"></bean>
+```
+
+
+
 
 
 #### 复杂数据类型的Bean配置
@@ -329,6 +488,30 @@ public class Class {
 </bean>
 ```
 
+或者
+
+```xml
+<bean id="claxx" class="org.czk.Class">
+    <constructor-arg name="className" value="Class B"></constructor-arg>
+    <constructor-arg name="allStudent">
+        <list>
+            <ref bean="student"></ref>
+            <ref bean="student"></ref>
+            <ref bean="student"></ref>
+            <ref bean="student"></ref>
+
+        </list>
+    </constructor-arg>
+
+</bean>
+```
+
+这样可以按顺序初始化List，对于List里面的是复杂数据类型用ref标签指向用哪个Bean来初始化，对于简单数据类型使用value标签直接初始化`<value>aaaaa</value>`
+
+Set和List一样有对应的set标签
+
+对于Map类型，里面包含的是entry，entry标签用key，ke'y-ref属性初始化key，用value，value-ref来初始化value，简单数据类型的用key，value属性，复杂数据类型的用带ref的指向要初始化的bean
+
 
 
 
@@ -339,5 +522,549 @@ public class Class {
 
 ```xml
 <alias name="student" alias="student2"></alias>
+```
+
+
+
+
+
+#### Bean作用域
+
+在bean标签加上scope属性
+
+```xml
+<bean id="people" class="org.czk.People" scope="singleton">
+    <constructor-arg name="name" type="String" value="aaa"></constructor-arg>
+    <constructor-arg name="age" type="int" value="1"></constructor-arg>
+
+    <property name="name" value="aaa"></property>
+    <property name="age" value="1"></property>
+</bean>
+
+<bean id="student" class="org.czk.Student" parent="people" scope="prototype">
+    <constructor-arg name="id" type="String" value="111111111"></constructor-arg>
+
+    <property name="id" value="111111111"></property>
+</bean>
+```
+
+> singleton 代表创建这个bean的单例模式，意思就是在整个程序中只实例化一次，每次getBean都会返回同一个实例（hashcode一样）
+
+> prototype 与singleton相反，它创建的是多例模式，每一次getBean都会创建一个bean的实例
+
+ 
+
+
+
+#### Web作用域
+
+> request 
+>
+> session
+>
+> application
+>
+> websocket
+
+
+
+
+
+#### 自定义作用域
+
+自定i一个scope实现双例模式
+
+实现一个自定义scope需要继承**org.springframework.beans.factory.config.Scope**类
+
+```java
+package org.czk;
+
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.config.Scope;
+
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class BinaryScope implements Scope {
+    Map<String, Object> map1 = new ConcurrentHashMap<String, Object>();
+    Map<String, Object> map2 = new ConcurrentHashMap<String, Object>();
+
+
+    @Override
+    public Object get(String s, ObjectFactory<?> objectFactory) {
+        if (!map1.containsKey(s)) {
+            Object o = objectFactory.getObject();
+            map1.put(s, o);
+            return o;
+        }
+
+        if (!map2.containsKey(s)) {
+            Object o = objectFactory.getObject();
+            map2.put(s, o);
+            return o;
+        }
+
+        if ( (new Random()).nextBoolean()) {
+            return map1.get(s);
+        } else {
+            return map2.get(s);
+        }
+    }
+
+    @Override
+    public Object remove(String s) {
+        if (map1.containsKey(s)) {
+            Object o = map1.get(s);
+            map1.remove(s);
+            return o;
+        }
+        if (map2.containsKey(s)) {
+            Object o = map2.get(s);
+            map2.remove(s);
+            return o;
+        }
+
+        return null;
+    }
+
+    @Override
+    public void registerDestructionCallback(String s, Runnable runnable) {
+
+    }
+
+    @Override
+    public Object resolveContextualObject(String s) {
+        return null;
+    }
+
+    @Override
+    public String getConversationId() {
+        return null;
+    }
+}
+```
+
+xml配置
+
+```xml
+<bean id="binaryScope" class="org.czk.BinaryScope"></bean>
+
+<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+    <property name="scopes">
+        <map>
+            <entry key="binaryScope" value-ref="binaryScope"></entry>
+        </map>
+    </property>
+</bean>
+```
+
+
+
+
+
+#### Bean懒加载
+
+在bean标签加上`lazy-init="true"`，或者在beans标签加上`default-lazy-init="true"`，之后所有的bean都是懒加载模式
+
+```xml
+<bean id="student" class="org.czk.Student" parent="people" scope="prototype" lazy-init="true">
+    <constructor-arg name="id" type="String" value="111111111"></constructor-arg>
+
+    <property name="id" value="111111111"></property>
+</bean>
+```
+
+设置了懒加载模式之后只有遇到getBean才会实例化一个bean对象
+
+
+
+
+
+#### Bean初始化和销毁
+
+在bean标签加上`init-method="initial" destroy-method="destory"`设置初始化和销毁时执行的方法
+
+如果所有的bean都有同名的初始化/销毁方法可以在beans标签设置`default-init-method` 和 `default-destroy-method`
+
+```xml
+<bean id="people" class="org.czk.People" scope="binaryScope" init-method="initial" destroy-method="destory">
+    <constructor-arg name="name" type="String" value="aaa"></constructor-arg>
+    <constructor-arg name="age" type="int" value="1"></constructor-arg>
+
+    <property name="name" value="aaa"></property>
+    <property name="age" value="1"></property>
+</bean>
+```
+
+显示销毁
+
+```java
+package org.czk;
+
+
+import org.junit.Test;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * Unit test for simple App.
+ */
+public class AppTest {
+    /**
+     * Rigorous Test :-)
+     */
+    @Test
+    public void shouldAnswerWithTrue() {
+        AbstractApplicationContext context =
+                new ClassPathXmlApplicationContext("springbean.xml");
+
+        People people = context.getBean("people", People.class);
+        people.info();
+
+        context.close();
+    }
+}
+```
+
+
+
+
+
+
+
+### Annotation配置Bean
+
+首先要创建一个管理Bean的类，相当于xml文件的作用
+
+```java
+package org.czk;
+
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class MyConfiguration {
+
+    @Bean
+    public People people() {
+        return new People("aaa", 1);
+    }
+
+    @Bean(value = "stu")
+    public Student student() {
+        return new Student("bbb", 12, "123456789");
+    }
+}
+```
+
+要设置Bean别名将`@Bean`标签的value传入`{'name1', 'name2', ...}`
+
+
+
+然后可以在Test中使用Bean
+
+```java
+package org.czk;
+
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+/**
+ * Unit test for simple App.
+ */
+public class AppTest {
+    /**
+     * Rigorous Test :-)
+     */
+    @Test
+    public void shouldAnswerWithTrue() {
+        ApplicationContext context =
+                new AnnotationConfigApplicationContext(MyConfiguration.class);
+
+        People people = context.getBean("people", People.class);
+        Student student = context.getBean("stu", Student.class);
+        people.info();
+        student.info();
+    }
+}
+```
+
+
+
+#### 简化配置
+
+在每个bean类加上`@Component`注解
+
+```java
+package org.czk;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Bean1 {
+}
+```
+
+在bean的配置类加上`@ComponentScan`这里指向存放Bean的包
+
+```java
+package org.czk;
+
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(value = "org.czk")
+public class MyConfiguration {
+}
+```
+
+
+
+使用三种方法注入字段值
+
+```java
+@Component
+public class Bean1 {
+    @Autowired
+    String string1;
+
+    public Bean1(String string1) {
+        this.string1 = string1;
+    }
+
+    public String getString1() {
+        return string1;
+    }
+
+    public void setString1(String string1) {
+        this.string1 = string1;
+    }
+}
+```
+
+```java
+@Component
+public class Bean1 { 
+    String string1;
+
+    @Autowired
+    public Bean1(String string1) {
+        this.string1 = string1;
+    }
+
+    public String getString1() {
+        return string1;
+    }
+
+    public void setString1(String string1) {
+        this.string1 = string1;
+    }
+}
+```
+
+```java
+@Component
+public class Bean1 {
+    String string1;
+ 
+    public Bean1(String string1) {
+        this.string1 = string1;
+    }
+
+    public String getString1() {
+        return string1;
+    }
+
+    @Autowired
+    public void setString1(String string1) {
+        this.string1 = string1;
+    }
+}
+```
+
+Configuration类要加上生成String的bean
+
+```java
+@Configuration
+@ComponentScan(value = "org.czk")
+public class MyConfiguration {
+
+    @Bean
+    public String string() {
+        return "aaaaa";
+    }
+}
+```
+
+使用简单数据类型也可以用`@Value`来初始化
+
+```java
+@Component
+public class Bean1 {
+    @Value("bbbb")
+    String string1;
+
+    public Bean1(String string1) {
+        this.string1 = string1;
+    }
+
+    public String getString1() {
+        return string1;
+    }
+
+    public void setString1(String string1) {
+        this.string1 = string1;
+    }
+}
+```
+
+
+
+
+
+集合类型的数据注入
+
+```java
+@Component
+public class Bean1 {
+    @Autowired
+    List<String> stringList;
+
+    @Override
+    public String toString() {
+        return "Bean1{" +
+                "stringList=" + stringList +
+                '}';
+    }
+}
+```
+
+
+
+生成多个list元素
+
+```java
+@Configuration
+@ComponentScan(value = "org.czk")
+public class MyConfiguration {
+
+    @Bean
+    @Order(24)
+    public String string1() {
+        return "aaaaa";
+    }
+
+    @Bean
+    @Order(50)
+    public String string2() {
+        return "bbbbbb";
+    }
+}
+```
+
+或者一个List搞定
+
+```java
+@Configuration
+@ComponentScan(value = "org.czk")
+public class MyConfiguration {
+
+    @Bean
+    public List<String > stringList() {
+        List<String> stringList = new ArrayList<String>();
+        stringList.add("ccccc");
+        stringList.add("dddddd");
+
+        return stringList;
+    }
+}
+```
+
+
+
+> 如果时Map的话写一个返回Map的Bean即可
+>
+> 或者时返回Map的key的bean和返回value的bean
+
+
+
+
+
+#### 设置作用域
+
+在类上加上`@Scope`标签设置`singleton` 或者 `prototype`
+
+首先先继承`**org.springframework.beans.factory.config.Scope**`创建自己的规则
+
+在Configuration类加上`**CustomScopeConfigurer**`的Bean
+
+```java
+package org.czk;
+
+
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Configuration
+@ComponentScan(value = "org.czk")
+public class MyConfiguration {
+
+    @Bean
+    public List<String > stringList() {
+        List<String> stringList = new ArrayList<String>();
+        stringList.add("ccccc");
+        stringList.add("dddddd");
+
+        return stringList;
+    }
+
+    @Bean
+    public CustomScopeConfigurer customScopeConfigurer() {
+        CustomScopeConfigurer customScopeConfigurer =
+                new CustomScopeConfigurer();
+        customScopeConfigurer.addScope("binaryScope", new BinaryScope());
+
+        return customScopeConfigurer;
+    }
+}
+
+```
+
+
+
+
+
+#### 懒加载
+
+在bean类上加上`@Lazy`即可实现懒加载，在Configuration类加则所有Bean实现懒加载
+
+
+
+
+
+#### Bean初始化和销毁
+
+```java
+@PostConstruct
+public void initial() {
+    // initial code
+}
+    
+@PreDestroy
+public void destroy() {
+    // destroy code
+}
 ```
 
