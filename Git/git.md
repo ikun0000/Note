@@ -90,6 +90,11 @@
 /*
 第一条命令用来回退到上一个版本，其中HEAD指向当前版本，HEAD^就是上一个版本，也可以用HEAD^^回退到上上个版本。第二条命令就是使用commit id回退。最后那条就是用来查看你处于的版本记录（会显示commit id）
 */
+
+# git revert HEAD~3
+/*
+还原第四次前的提交，并在还原更改后创建一次新的提交
+*/
 ```
 
 ```
@@ -140,8 +145,25 @@
 // 推送本地到远程仓库
 # git push -u origin master
 
-// 使用远程仓库更新本地
+// 使用远程仓库更新本地，备份一条分支
 # git pull origin master
+
+// 推送本地到远端origin
+# git push origin
+
+// 查看项目和那些远端仓库相连
+# git remote
+# git remote -v
+
+// 拉取远端仓库，fetch是拉取全部的东西，pull只是拉取一个分支
+# git fetch
+
+// git clone的做法
+$ mkdir project.git
+$ cd project.git
+$ git init
+$ git remote add -f -t master -m master来源git：//example.com/git.git/
+$ git merge origin
 ```
 
 
