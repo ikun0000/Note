@@ -140,7 +140,9 @@
 然后再github上建立一个仓库，然后就会出现一些命令，就是用来给你克隆这个残酷到本地的
 */
 
+# 在项目中添加一个远程仓库
 # git remote add origin git.michaelliao/learngit.git
+# git remote add new git.michaelliao/studygit.git
 
 // 推送本地到远程仓库
 # git push -u origin master
