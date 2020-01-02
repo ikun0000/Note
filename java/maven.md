@@ -337,3 +337,18 @@ Error: java error: release version 5 not supported
    </properties> 
 ```
 
+
+
+
+
+### IDEA无法识别SpringBoot程序
+
+#### 方法1
+
+打开设置（Ctrl+Alt+S），在keymap搜索` Invalidate Caches/Restart `并设置快捷键，然后清除缓存并重启IDEA
+
+
+
+#### 方法2
+
+检查重新导入pom依赖，在pom文件（ 右键 --> maven -->reimport ）
