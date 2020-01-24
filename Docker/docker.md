@@ -373,9 +373,10 @@ DockerFile语法：
 
 ```
 # docker run -d -v /usr/share/nginx/html nginx
+# docker run -d -v /usr/share/nginx/html:ro nginx
 ```
 
-运行nginx镜像并把容器内部/usr/share/nginx/html挂在到宿主机（使用docker inspect 可以查看（Mounts）），也可以 -v 宿主目录:容器目录
+运行nginx镜像并把容器内部/usr/share/nginx/html挂在到宿主机（使用docker inspect 可以查看（Mounts）），也可以 -v 宿主目录:容器目录，最后带上对容器的权限
 
 
 
