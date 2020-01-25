@@ -352,23 +352,21 @@ EXPOSE			80
 
 DockerFile语法：
 
-| 命令          | 用途         |
-| ------------- | ------------ |
-| FROM          | 基础镜像     |
-| RUN           | 执行命令     |
-| COPY          | 拷贝文件     |
-| ADD           | 添加文件     |
-| CMD           | 执行命令     |
-| EXPOSE        | 暴露端口     |
-| WORKDIR       | 指定路径     |
-| MAINTAINER    | 维护者       |
-| ENV           | 设置环境变量 |
-| ENTRYPOINT [] | 容器入口     |
-| USER          | 指定用户     |
-| VOLUME        | mount point  |
-
-
-
+| 命令       | 用途                                                         |
+| ---------- | ------------------------------------------------------------ |
+| FROM       | 基础镜像，当前新镜像是基于哪个镜像                           |
+| RUN        | 容器构建时需要运行的命令                                     |
+| COPY       | 类似AD，拷贝文件和目录到镜像中                               |
+| ADD        | 将宿主主机目录下的文件拷贝进镜像且ADD命令会自动处理RUL和解压tar压缩包 |
+| CMD        | 指定一个容器启动时要运行的命令。Dockerfile中可以有多个CMD命令，但只有最后一个生效，CMD会被docker run之后的参数替换 |
+| EXPOSE     | 当前容器对外暴露出的端口                                     |
+| WORKDIR    | 指定在容器创建后，终端登录进来的工作目录                     |
+| MAINTAINER | 镜像的维护者的姓名和邮箱                                     |
+| ENV        | 用来在构建镜像过程中设置环境变量                             |
+| ENTRYPOINT | 指定一个容器启动时要运行的命令。ENTRYPOINT和CMD的目的一样，但ENTRYPOINT会把docker run后面的参数追加 |
+| USER       | 指定用户                                                     |
+| VOLUME     | 容器数据卷，用于数据保存和持久化工作                         |
+| ONBUILD | 当构建一个被继承的Dockerfile时运行的命令，父镜像在被子镜像继承后父镜像的onbuild会被触发 |
 ##### Volume
 
 ```
