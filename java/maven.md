@@ -352,3 +352,36 @@ Error: java error: release version 5 not supported
 #### 方法2
 
 检查重新导入pom依赖，在pom文件（ 右键 --> maven -->reimport ）
+
+
+
+### Maven无法打包java目录下的资源文件
+
+在pom.xml中添加下面的配置，打包proterties，yml，xml
+
+```
+<build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.yml</include>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.yml</include>
+          <include>**/*.xml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+```
+
