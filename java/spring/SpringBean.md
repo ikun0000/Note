@@ -55,13 +55,20 @@ Bean的xml基本配置
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <!-- 这里写自己的Bean -->
+	<!-- 这里写自己的Bean -->
 
 </beans>
 ```
@@ -646,6 +653,28 @@ public class AppTest {
 
 
 
+#### 开启注解开发
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config></context:annotation-config>
+
+</beans>
+```
+
+
+
 
 
 ### Annotation配置Bean
@@ -675,6 +704,29 @@ public class MyConfiguration {
 ```
 
 要设置Bean别名将`@Bean`标签的value传入`{'name1', 'name2', ...}`
+
+
+
+#### 使用@Autowired
+
+require设置为false允许属性为null
+
+@Qualifier显示指定唯一的bean
+
+```java
+public class Human {
+
+    @Autowired(required = false)
+    private Cat cat;
+    @Autowired
+    @Qualifier(value = "dog222")
+    private Dog dog;
+    private String name;
+ 	// get set toString   
+}
+```
+
+
 
 
 
@@ -724,6 +776,17 @@ public class Bean1 {
 }
 ```
 
+>@Component
+>
+>@Repository
+>
+>@Service
+>
+>@Controller
+>
+>这四个注解都是一样的，都是注册到spring容器中
+>
+
 在bean的配置类加上`@ComponentScan`这里指向存放Bean的包
 
 ```java
@@ -739,7 +802,7 @@ public class MyConfiguration {
 }
 ```
 
-
+> 使用@Import(配置类)可以导入其他配置类
 
 使用三种方法注入字段值
 
@@ -805,6 +868,8 @@ public class Bean1 {
 
 Configuration类要加上生成String的bean
 
+> 默认情况下使用@Bean注解配置的bean的bean id是方法名
+
 ```java
 @Configuration
 @ComponentScan(value = "org.czk")
@@ -820,7 +885,7 @@ public class MyConfiguration {
 使用简单数据类型也可以用`@Value`来初始化
 
 ```java
-@Component
+@Component 
 public class Bean1 {
     @Value("bbbb")
     String string1;
@@ -909,11 +974,21 @@ public class MyConfiguration {
 
 
 
-
-
 #### 设置作用域
 
 在类上加上`@Scope`标签设置`singleton` 或者 `prototype`
+
+```java
+@Repository
+@Scope("singleton")
+public class User {
+    @Value("aaa")
+    private String name;
+	// get set
+}
+```
+
+
 
 首先先继承`**org.springframework.beans.factory.config.Scope**`创建自己的规则
 
@@ -967,8 +1042,6 @@ public class MyConfiguration {
 
 
 
-
-
 #### Bean初始化和销毁
 
 ```java
@@ -981,5 +1054,175 @@ public void initial() {
 public void destroy() {
     // destroy code
 }
+```
+
+
+
+#### 导入其他beans的配置
+
+applicationContext.xml
+
+```
+<import resource="./beans.xml"></import>
+```
+
+
+
+#### 配置各种类型bean大杂烩
+
+Address
+
+```java
+public class Address {
+    private String address;
+	// get set toString
+}
+```
+
+Student
+
+```java
+public class Student {
+    private String name;
+    private Address address;
+    private String[] books;
+    private List<String> hobbys;
+    private Map<String, String> card;
+    private Set<String> games;
+    private Properties info;
+    private String wife;
+	// get set toString
+}
+```
+
+applicationContext.xml
+
+```xml
+<bean id="address" class="org.example.pojo.Address" scope="prototype">
+        <property name="address" value="天桥底"></property>
+    </bean>
+
+    <bean id="student" class="org.example.pojo.Student" scope="prototype">
+        <property name="name" value="测试姓名"></property>
+
+        <property name="address" ref="address"></property>
+
+        <property name="books">
+            <array>
+                <value>大学物理</value>
+                <value>高等数学</value>
+                <value>专业英语</value>
+            </array>
+        </property>
+
+        <property name="wife">
+            <null></null>
+        </property>
+
+        <property name="card">
+            <map>
+                <entry key="校园卡" value="50元"></entry>
+                <entry key="饭卡" value="500元"></entry>
+                <entry key="公交卡" value="100元"></entry>
+            </map>
+        </property>
+
+        <property name="hobbys">
+            <list>
+                <value>唱</value>
+                <value>跳</value>
+                <value>rep</value>
+                <value>篮球</value>
+            </list>
+        </property>
+
+        <property name="games">
+            <set>
+                <value>王者荣耀</value>
+                <value>GTA</value>
+                <value>吃鸡</value>
+                <value>老滚5</value>
+                <value>彩6</value>
+            </set>
+        </property>
+
+        <property name="info">
+            <props>
+                <prop key="年级">大一</prop>
+            </props>
+        </property>
+    </bean>
+```
+
+
+
+#### 使用p(properties)命名空间和c(constructor)命名空间注入属性值
+
+User
+
+```java
+public class User {
+    private String name;
+    private int age;
+	// NoArgsConstractor AllArgsConstractor get set toString
+}
+```
+
+
+
+userbeans.xml
+
+`p`后面跟着属性名，`c`后面跟着构造函数的参数名
+
+```xml
+<bean id="user" class="org.example.pojo.User" p:name="aaa" p:age="26"></bean>
+<bean id="userc" class="org.example.pojo.User" c:name="bbb" c:age="22"></bean>
+```
+
+
+
+
+
+#### Bean自动装配
+
+autowire
+
+> byName: 在上下文寻找和set方法名匹配的bean并自动装配
+>
+> byType: 在上下文寻找和set类型匹配的bean并自动装配
+
+pojo
+
+```java
+class Cat {
+    public void say() {
+        System.out.println("miao");
+    }
+}
+
+class Dog {
+    public void say() {
+        System.out.println("wang");
+    }
+}
+
+class Human {
+    private Cat cat;
+    private Dog dog;
+    private String name;
+	// get set toString
+}
+```
+
+
+
+applicationContext.xml
+
+```xml
+<bean id="cat" class="org.example.pojo.Cat"></bean>
+<bean id="dog" class="org.example.pojo.Dog"></bean>
+<bean id="human" class="org.example.pojo.Human" autowire="byName">
+    <property name="name" value="aa"></property>
+</bean>
 ```
 

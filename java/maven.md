@@ -14,7 +14,7 @@
 
 在`MAVEN_HOME`目录下的conf目录下的settings.xml文件中找到mirrors那一块（默认是注释）在那个位置加上下面这个，复制`<mirrors></mirrors>`里面的就行，**加s的代表镜像源集合，不加s的就是其中一个镜像源，下面有好多标签类似这样**
 
-```
+```xml
 <mirrors>
     <mirror>
       <id>alimaven</id>
@@ -113,7 +113,7 @@ Maven project
 
 配置项目下的pom.xml文件，在`<project></project>`下添加
 
-```
+```xml
 <build>
         <plugins>
             <plugin>
@@ -142,7 +142,7 @@ Maven project
 
 ### pom.xml常用元素
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -239,7 +239,7 @@ Maven project
 
 `<properties></properties>`里面定义的标签后面可以通过`${...}`来引用，比如：
 
-```
+```xml
 <properties>
 	<junit.version>4.10</junit.version>
 </properties>
@@ -281,9 +281,11 @@ Maven project
 
 `<modules></modules>`用来聚合多个运行的Maven项目，里面使用`<module></module>`
 
-聚合项目：
+聚合项目
 
-```
+父项目配置modules：
+
+```xml
 <modules>
 	<module>../artifactId-001</module>
 	<module>../artifactId-002</module>
@@ -291,7 +293,52 @@ Maven project
 </modules>
 ```
 
+子项目配置父项目：
 
+```xml
+<parent>
+    <artifactId>parentartifact</artifactId>
+    <groupId>com.example</groupId>
+    <version>1.0-SNAPSHOT</version>
+</parent>
+<modelVersion>4.0.0</modelVersion>
+```
+
+
+
+#### 建立模块项目
+
+1. 创建一个空的maven项目，pom.xml正常配置
+
+2. 在pom.xml中添加子项目的modules
+
+   `<module>`标签为子项目的路径
+
+   ```xml
+   <modules>
+       <module>springlearn01</module>
+       <module>HelloSpring02</module>
+       <module>springioc03</module>
+       <module>springdi04</module>
+       <module>springautowired05</module>
+       <module>springanno06</module>
+   </modules>
+   ```
+
+3. 子项目添加`<parent>`标签
+
+   子项目只需要添加artifact id即可
+
+   ```xml
+   <parent>
+       <artifactId>springlearn</artifactId>
+       <groupId>org.example</groupId>
+       <version>1.0-SNAPSHOT</version>
+   </parent>
+   <artifactId>springanno06</artifactId>
+   ```
+
+   
 
 
 
