@@ -97,6 +97,134 @@ execution(* com.xyz.service.Bean1.aaa(..))
 
 
 
+### Spring实现AOP
+
+#### 方法1
+
+业务类
+
+```java
+public interface UserService {
+    void add();
+    void delete();
+    void update();
+    void query();
+}
+
+public class UserServiceImpl implements UserService {
+    @Override
+    public void add() {
+        System.out.println("add user");
+    }
+
+    @Override
+    public void delete() {
+        System.out.println("delete user");
+    }
+
+    @Override
+    public void update() {
+        System.out.println("update user");
+    }
+
+    @Override
+    public void query() {
+        System.out.println("query user");
+    }
+}
+```
+
+前置通知类：
+
+```java
+public class Log implements MethodBeforeAdvice {
+    @Override
+    public void before(Method method, Object[] args, Object target) throws Throwable {
+        System.out.println(target.getClass().getName() + "   :   " + method.getName());
+    }
+}
+```
+
+后置通知类：
+
+```java
+public class AfterLog implements AfterReturningAdvice {
+    @Override
+    public void afterReturning(Object returnValue, Method method, Object[] args, Object target) throws Throwable {
+        System.out.println("return " + method.getName() + " return value  " + returnValue);
+    }
+}
+```
+
+  applicationContext.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 注册bean -->
+    <bean id="userService" class="org.example.service.UserServiceImpl"></bean>
+    <bean id="afterLog" class="org.example.log.AfterLog"></bean>
+    <bean id="log" class="org.example.log.Log"></bean>
+
+<!--     配置AOP -->
+    <aop:config>
+        <!-- execution(修饰符 返回值 类名 方法名 (参数)) -->
+        <aop:pointcut id="pc" expression="execution(* org.example.service.UserServiceImpl.*(..))"/>
+        <!-- 执行环绕 -->
+        <aop:advisor advice-ref="log" pointcut-ref="pc"></aop:advisor>
+        <aop:advisor advice-ref="afterLog" pointcut-ref="pc"></aop:advisor>
+    </aop:config>
+
+</beans>
+```
+
+
+
+#### 方法2(注册切面)
+
+通知类：
+
+```java
+public class MyAdvice {
+    void before() {
+        System.out.println("=========before=========");
+    }
+
+    void after() {
+        System.out.println("=========after=========");
+    }
+}
+```
+
+applicationContext.xml
+
+```xml
+<bean id="myAdvice" class="org.example.log.MyAdvice"></bean>
+
+<aop:config>
+    <aop:aspect ref="myAdvice">
+        <aop:pointcut id="pc" expression="execution(* org.example.service.UserServiceImpl.*(..))"/>
+        <aop:before method="before" pointcut-ref="pc"></aop:before>
+        <aop:after-returning method="after" pointcut-ref="pc"></aop:after-returning>
+    </aop:aspect>
+</aop:config>
+```
+
+
+
 
 
 ### 注解实现
@@ -196,7 +324,10 @@ public class MyAspect {
 
     @Around("execution(* org.czk.targetobject.Bean1.around(..))")           // 环绕通知
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        System.out.println("around before");
         Object retVal = proceedingJoinPoint.proceed();                  // 这里真正调用要执行的方法，如果有参数以Object[]传入
+        // proceedingJoinPoint.proceed(proceedingJoinPoint.getArgs());
+        System.out.println("around after");
         return retVal;
     }
 }
