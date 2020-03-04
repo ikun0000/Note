@@ -275,3 +275,29 @@ ${msg}
 </html>        
 ```
 
+
+
+
+
+## 使用Jackson后解决JSON乱码问题
+
+在springmvc.xml配置中加上
+
+```xml
+<!-- JSON乱码配置 -->
+<mvc:annotation-driven>
+    <mvc:message-converters register-defaults="true">
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+            <constructor-arg value="UTF-8"></constructor-arg>
+        </bean>
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            <property name="objectMapper">
+                <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
+                    <property name="failOnEmptyBeans" value="false"></property>
+                </bean>
+            </property>
+        </bean>
+    </mvc:message-converters>
+</mvc:annotation-driven>
+```
+
