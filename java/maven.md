@@ -374,7 +374,7 @@ Error: java error: release version 5 not supported
 
 在`<project></project>`里面加上下面这段配置，让他使用JDK1.8
 
-```
+```xml
 <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="./userbean.xml"></import>
+
+    <bean id="address" class="org.example.pojo.Address" scope="prototype">
+        <property name="address" value="天桥底"></property>
+    </bean>
+
+    <bean id="student" class="org.example.pojo.Student" scope="prototype">
+        <property name="name" value="测试姓名"></property>
+
+        <property name="address" ref="address"></property>
+
+        <property name="books">
+            <array>
+                <value>大学物理</value>
+                <value>高等数学</value>
+                <value>专业英语</value>
+            </array>
+        </property>
+
+        <property name="wife">
+            <null></null>
+        </property>
+
+        <property name="card">
+            <map>
+                <entry key="校园卡" value="50元"></entry>
+                <entry key="饭卡" value="500元"></entry>
+                <entry key="公交卡" value="100元"></entry>
+            </map>
+        </property>
+
+        <property name="hobbys">
+            <list>
+                <value>唱</value>
+                <value>跳</value>
+                <value>rep</value>
+                <value>篮球</value>
+            </list>
+        </property>
+
+        <property name="games">
+            <set>
+                <value>王者荣耀</value>
+                <value>GTA</value>
+                <value>吃鸡</value>
+                <value>LOL</value>
+                <value>彩6</value>
+            </set>
+        </property>
+
+        <property name="info">
+            <props>
+                <prop key="年级">大一</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>
+

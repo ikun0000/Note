@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="user" class="org.example.pojo.User">
+        <constructor-arg name="name" type="java.lang.String" value="constructor"></constructor-arg>
+        <!--        <property name="name" value="test name"></property>-->
+    </bean>
+
+    <alias name="user" alias="user2"></alias>
+
+    <bean id="userT" class="org.example.pojo.UserT" lazy-init="true" name="ut,tt">
+        <property name="name" value="usert"></property>
+    </bean>
+
+</beans>
