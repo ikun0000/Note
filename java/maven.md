@@ -406,7 +406,7 @@ Error: java error: release version 5 not supported
 
 在pom.xml中添加下面的配置，打包proterties，yml，xml
 
-```
+```xml
 <build>
     <resources>
       <resource>

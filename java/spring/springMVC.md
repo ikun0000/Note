@@ -301,3 +301,101 @@ ${msg}
 </mvc:annotation-driven>
 ```
 
+
+
+## 拦截器
+
+编写拦截器只需要实现HandlerInterceptor接口
+
+```java
+public class MyInterceptor implements HandlerInterceptor {
+
+    // 请求前
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("================处理前================");
+        return true;
+    }
+	
+    // 请求后
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        System.out.println("================处理后================");
+    }
+	
+    // 完成后
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("================完成后================");
+    }
+}
+```
+
+然后再springmvc-config.xml中配置就可以了
+
+```xml
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--
+             /      拦截这个请求
+             /*     过滤当前路径下的请求
+             /**    过滤当前路径下的请求和当前路径下所有的请求
+             -->
+            <mvc:mapping path="/main"/>
+            <mvc:mapping path="/success"/>
+            <!-- <mvc:exclude-mapping path="/fail"/> -->
+            <bean class="com.example.interceptor.MyInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+```
+
+
+
+
+
+## 文件上传
+
+导入依赖
+
+```xml
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.6</version>
+</dependency>
+    
+<dependency>
+    <groupId>commons-fileupload</groupId>
+    <artifactId>commons-fileupload</artifactId>
+    <version>1.4</version>
+</dependency>
+```
+
+配置bean
+
+> ID必须为这个名字
+
+```xml
+<bean id="multipartResolver"
+class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+<property name="maxUploadSize" value="10485760"/>
+</bean>
+```
+
+在controller就可以使用
+
+```java
+MultipartFile upload
+```
+
+接收上传的文件了
+
+
+
+```java
+// 下面代码获取当前项目的webapp目录在系统中的绝对路径的字符串
+String path = request.getSession().getServletContext().getRealPath("");
+// 下面代码获取当前项目的webapp目录的绝对路径的字符串使用系统的路径分隔符拼上参数指定的路径
+String path = request.getSession().getServletContext().getRealPath("/upload");
+```
+
