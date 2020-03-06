@@ -39,12 +39,12 @@ person:
   name: aa
   age: 20
   happy: false
-  birthday: 5/23/2001
+  birthday: 5/23/2001			# 日期格式：month/day/year
   maps: {game: gta, eat: burger}
   list: [aa, bb, cc]
   dog:
-    name: bb
-    age: 2
+    name: ${person.name}_dog    # 支持变量引用，支持EL表达式
+    age: ${person.age:10}
 
 pp.blog: http://example.com
 ```
