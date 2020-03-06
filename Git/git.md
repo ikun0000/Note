@@ -149,6 +149,7 @@
 
 // 使用远程仓库更新本地，备份一条分支
 # git pull origin master
+# git pull origin next   // 拉取远程分支next合并到当前分支
 
 // 推送本地到远端origin
 # git push origin
@@ -200,6 +201,9 @@ checkout加上-b参数就是创建加移动到这个分支，相当于：
 # git log --graph --pretty=oneline --abbrev-commit
 // --graph 用来显示分支图
 // --pretty=oneline显示一行
+
+# git push --all			// 推送本地所有分支
+# git push origin master	// 推送master分支到origin
 ```
 
 
