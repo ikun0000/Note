@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.10.10.246:3306/test_mybatis
+    username: root
+    password: 123456
+    schema:
+      - classpath:sql/employee.sql
+      - classpath:sql/department.sql
+    initialization-mode: always
+
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations:
+    - classpath:mybatis/mappers/*.xml

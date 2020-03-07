@@ -1,0 +1,17 @@
+
+spring:
+  rabbitmq:
+    host: 10.10.10.246
+    port: 5672
+    username: user
+    password: password
+
+
+mq:
+  config:
+    exchange: order.fanout
+    queue:
+      sms:
+        name: order.sms
+      push:
+        name: order.push

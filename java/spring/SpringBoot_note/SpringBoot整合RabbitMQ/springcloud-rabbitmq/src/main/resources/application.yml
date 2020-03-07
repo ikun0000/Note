@@ -1,0 +1,21 @@
+
+spring:
+  rabbitmq:
+    host: 10.10.10.246
+    port: 5672
+    username: user
+    password: password
+
+# set exchange name
+mq:
+  config:
+    exchange: log.direct
+    queue:
+      info:
+        name: log.info
+        routing:
+          key: log.info.routing.key
+      error:
+        name: log.error
+        routing:
+          key: log.error.routing.key

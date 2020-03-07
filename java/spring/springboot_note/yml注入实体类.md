@@ -48,3 +48,81 @@ person:
 
 pp.blog: http://example.com
 ```
+
+
+
+### 读取配置文件的优先级和位置
+
+1. `file:./config/`
+2. `file:./`
+3. `classpath:/config/`
+4. `classpath:/`
+
+
+
+### SpringBoot多环境切换
+
+#### 1. 多文件配置
+
+配置文件位置
+
+```
+resources
+	+ application.yml
+	+ application-dev.yml
+	+ application-prod.yml
+```
+
+application-dev.yml
+
+```yaml
+server:
+  port: 8080
+```
+
+application-prod.yml
+
+```yaml
+server:
+  port: 80
+```
+
+application.yml
+
+```yaml
+spring:
+  profiles:
+    active: dev
+```
+
+
+
+#### 2.单文件多模块配置
+
+目录结构
+
+```
+resources
+	+ application.yml
+```
+
+application.yml
+
+```yaml
+---
+spring:
+  profiles:
+    active: dev
+---
+server:
+  port: 8081
+spring:
+  profiles: dev
+---
+server:
+  port: 80
+spring:
+  profiles: prod
+---
+```
+

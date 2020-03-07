@@ -1,0 +1,17 @@
+
+server:
+  port: 8080
+spring:
+# 设置国际化语言信息的配置文件的位置，带上目录名和基础名
+  messages:
+    basename: i18n.index
+
+# 开发时禁用模板引擎缓存
+  thymeleaf:
+    cache: false
+  mvc:
+    date-format: yyyy-MM-dd
+    hiddenmethod:
+      filter:
+        enabled: true
+
