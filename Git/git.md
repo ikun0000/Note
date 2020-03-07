@@ -240,3 +240,68 @@ checkout加上-b参数就是创建加移动到这个分支，相当于：
 
 ```
 
+
+
+### Git设置http代理
+
+```
+// 设置http和https代理地址
+# git config --global http.proxy 代理地址
+# git config --global https.proxy 代理地址
+
+// 取消代理
+# git config --global --unset http.proxy
+# git config --global --unset https.proxy
+
+// 查看设置的代理
+# git config --global --get http.proxy
+# git config --global --get https.proxy
+```
+
+
+
+### Git设置socks5代理
+
+```
+// 1080是ssr的本地端口，不是服务器开放的端口
+# git config --global http.proxy 'socks5://127.0.0.1:1080'
+# git config --global https.proxy 'socks5://127.0.0.1:1080'
+```
+
+
+
+### 生成SSH密钥
+
+首先查看本地是否已经生成了公钥，有的话直接使用就好了
+
+```
+$ cd ~/.ssh
+$ ls
+authorized_keys2  id_dsa       known_hosts
+config            id_dsa.pub
+```
+
+不存在就要创建了
+
+用下面的命令加上绑定github的邮箱生成SSH key
+
+```
+$ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+> Generating public/private rsa key pair.
+> Enter a file in which to save the key (/c/Users/you/.ssh/id_rsa):[Press enter]
+> Enter passphrase (empty for no passphrase): [Type a passphrase]
+> Enter same passphrase again: [Type passphrase again]
+```
+
+然后再~/.ssh就生成SSH key了
+
+```
+$ cat ~/.ssh/id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAklOUpkDHrfHY17SbrmTIpNLTGK9Tjom/BWDSU
+GPl+nafzlHDTYW7hdI4yZ5ew18JH4JW9jbhUFrviQzM7xlELEVf4h9lFX5QVkbPppSwg0cda3
+Pbv7kOdJ/MTyBlWXFCR+HAo3FXRitBqxiX1nKhXpHAZsMciLq8V6RjsNAQwdsdMFvSlVK/7XA
+t3FaoJoAsncM1Q9x5+3V0Ww68/eIFmb1zuUFljQJKprrX88XypNDvjYNby6vw/Pb0rwert/En
+mZ+AW4OZPnTPI89ZPmVMLuayrD2cE86Z/il8b+gw3r3+1nKatmIkjn2so1d01QraTlMqVSsbx
+NrRFi9wrf+M7Q== schacon@mylaptop.local
+```
+
