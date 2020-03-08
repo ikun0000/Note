@@ -1,0 +1,25 @@
+
+spring:
+  thymeleaf:
+    cache: false
+  session:
+    store-type: REDIS
+    timeout: 10000
+  redis:
+    host: 10.10.10.246
+    port: 6379
+    database: 1
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 0
+        max-active: 8
+        max-wait: 1
+    timeout: 3000
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://10.10.10.246:3306/login_info
+    username: root
+    password: 123456
+
