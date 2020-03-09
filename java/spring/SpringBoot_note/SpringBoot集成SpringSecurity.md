@@ -397,6 +397,20 @@ http.authorizeRequests()        // 对请求进行认证
 * ``hasRole(String)`设置一个角色
 * `hasIpAddress()`只允许放行的ip地址
 
+
+
+拦截GET, POST, PUT, DELETE请求
+
+```java
+http.authorizeRequests()
+    .antMatchers(HttpMethod.GET, "/test1").authenticated()	// 拦截/test1的GET请求
+    .antMatchers(HttpMethod.POST, "/test2").authenticated()   // 拦截/test2的POST请求
+    .antMatchers(HttpMethod.PUT, "/test3").authenticated()   // 拦截/test3的PUT请求
+    .antMatchers(HttpMethod.DELETE, "/test4").authenticated()  // 拦截/test4的DELETE请求
+```
+
+
+
 > 角色和权限的区别
 >
 > 1. 权限只是一个字符串，在`UserDetailsService`使用`AuthorityUtils.commaSeparatedStringToAuthorityList(String)`返回，比较的时候会把用户的权限拿出来和配置的比较
