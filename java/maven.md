@@ -432,3 +432,20 @@ Error: java error: release version 5 not supported
   </build>
 ```
 
+
+
+### Maven编译显示`Caused by: org.apache.maven.plugin.compiler.CompilationFailureException: Compilation failure`
+
+可能是编译时版本过低， 修改编译时的版本
+
+```xml
+<plugin>  
+    <groupId>org.apache.maven.plugins</groupId>  
+    <artifactId>maven-compiler-plugin</artifactId>  
+    <configuration>  
+        <source>1.8</source>  
+        <target>1.8</target>  
+    </configuration>  
+</plugin>
+```
+
