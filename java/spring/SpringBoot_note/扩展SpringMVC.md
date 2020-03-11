@@ -93,3 +93,211 @@ public class WebMvcAutoConfiguration {
 在mvc自动配置类标注了`@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)`，即没有这个bean才加载自动配置
 
 所以自动配置失效
+
+
+
+
+
+### 加载properties文件
+
+`@PropertyResource`用于加载一个properties文件，springboot默认只加载application.yml，application.properties文件，如果有多个文件需要导入，在配置类上加上`@PropertySource`导入，导入之后可以配合` @ConfigurationProperties `和`@Value`使用
+
+properties file
+
+```properties
+user.name="aaa"
+user.password="123456"
+```
+
+configuration class
+
+```java
+@Configuration
+@PropertySource(value = {"classpath:userprop.properties"})
+public class MVCConfig {
+    @Value("${user.name}")
+    private String name;
+    @Value("${user.password}")
+    private String password;
+}
+```
+
+
+
+### 加载Spring配置文件
+
+springboot可以使用SpringMVC的applicationContext.xml配置bean，springboot使用` @ImportResource `导入springMVC的配置文件
+
+applicationContext.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+
+    <bean id="student" class="com.example.entity.Student">
+        <property name="name" value="test"></property>
+        <property name="age" value="20"></property>
+    </bean>
+
+</beans>
+```
+
+configuration class
+
+```java
+@Configuration
+@ImportResource(value = {"classpath:applicationContext.xml"})
+public class MVCConfig {
+}
+```
+
+
+
+### Spring boot注册三大组件
+
+
+
+#### 注册servlet
+
+继承servlet
+
+```java
+@Component
+public class MyServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doGet(req, resp);
+        // TODO
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+注册servlet
+
+```java
+@Configuration
+public class MVCConfig {
+
+    @Autowired
+    private MyServlet myServlet;
+
+    @Bean
+    public ServletRegistrationBean servletRegistrationBean() {
+        ServletRegistrationBean<Servlet> bean = new ServletRegistrationBean<>(myServlet, "/test");	// 传入servlet和映射路径
+        return bean;
+    }
+
+}
+```
+
+
+
+#### 注册过滤器
+
+实现filter
+
+```java
+@Component
+public class MyFilter implements Filter {
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        // TODO
+        chain.doFilter(request, response);
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+}
+```
+
+注册filter
+
+```java
+@Configuration
+public class MVCConfig {
+
+    @Autowired
+    private MyFilter myFilter;
+
+    @Bean
+    public FilterRegistrationBean filterRegistrationBean() {
+        FilterRegistrationBean<Filter> bean = new FilterRegistrationBean<>();
+        bean.setFilter(myFilter);		// 设置filter
+        bean.addUrlPatterns("/*");		// 添加拦截路径
+        return bean;
+    }
+}
+```
+
+
+
+#### 注册监听器
+
+实现监听器
+
+```java
+@Component
+public class MyServletContextListener implements ServletContextListener {
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        // TODO
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        // TODO
+    }
+}
+```
+
+注册Listener
+
+```java
+@Configuration
+public class MVCConfig {
+
+    @Autowired
+    private MyServletContextListener myServletContextListener;
+
+    @Bean
+    public ServletListenerRegistrationBean servletListenerRegistrationBean() {
+        ServletListenerRegistrationBean<EventListener> bean = new ServletListenerRegistrationBean<>();
+        bean.setListener(myServletContextListener);
+        return bean;
+    }
+}
+```
+
