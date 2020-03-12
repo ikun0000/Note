@@ -1,6 +1,8 @@
 # IDEA community插件表
 
-[IntelliJ Idea 常用10款插件（提高开发效率），附优秀主题插件](https://blog.csdn.net/weixin_41846320/article/details/82697818)
+>  [IntelliJ Idea 常用10款插件（提高开发效率），附优秀主题插件](https://blog.csdn.net/weixin_41846320/article/details/82697818)
+>
+> [Java软件开发利器：IDEA插件分享!以Spring Boot项目为载体进行视频教程演示](https://www.bilibili.com/video/av95417273/)
 
 1.   Database Navigator  数据库管理
 2.  Spring Assistant      SpringBoot初始化器
@@ -17,3 +19,14 @@
 24.   Smart Tomcat         社区版的野生tomcat
 25.   MyBatis plugin       Mybatis支持
 30.   Lombok          使用Lombok时不报错
+16.   Background Image Plus     设置IDEA背景图
+17.    CodeGlance      右侧展示代码地图
+18.    Translation     IDEA翻译插件
+19.    Rainbow Brackets        彩虹色括号标记
+20.    Grep Console        日志着色插件
+21.    Statistic         代码统计插件
+22.    Markdown Navigator         Markdown编辑插件
+23.    GsonFormat        根据json生成实体类
+24.    MyBatis Log Plugin        查看Mybatis真正执行的完整的SQL语句
+25.    Free Mybatis plugin       快速跳转Mybatis接口和xml
+26.    Alibaba Java Coding Guidelines          阿里巴巴开发规范 
