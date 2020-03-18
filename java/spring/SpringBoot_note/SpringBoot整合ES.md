@@ -290,33 +290,6 @@ public void testMatchQuery() {
 }
 
 @Test
-public void testMatchPhraseQuery() {
-    NativeSearchQueryBuilder nativeQueryBuilder = new NativeSearchQueryBuilder();
-    nativeQueryBuilder.withQuery(QueryBuilders.matchPhraseQuery("title", "JAVA教程"));
-    Page<Article> page = articleRepository.search(nativeQueryBuilder.build());
-
-    System.out.println(page.getContent());
-}
-
-@Test
-public void testFuzzyQuery() {
-    NativeSearchQueryBuilder nativeQueryBuilder = new NativeSearchQueryBuilder();
-    nativeQueryBuilder.withQuery(QueryBuilders.fuzzyQuery("comment", "java"));
-    Page<Article> page = articleRepository.search(nativeQueryBuilder.build());
-
-    System.out.println(page.getContent());
-}
-
-@Test
-public void testTermQuery() {
-    NativeSearchQueryBuilder nativeQueryBuilder = new NativeSearchQueryBuilder();
-    nativeQueryBuilder.withQuery(QueryBuilders.termQuery("comment", "html"));
-    Page<Article> page = articleRepository.search(nativeQueryBuilder.build());
-
-    System.out.println(page.getContent());
-}
-
-@Test
 public void testRangeQuery() {
     NativeSearchQueryBuilder nativeQueryBuilder = new NativeSearchQueryBuilder();
     Date before = new Date();
@@ -331,3 +304,53 @@ public void testRangeQuery() {
 }
 ```
 
+
+
+#### `ElasticsearchRepository`
+
+`ElasticsearchRepository`和使用RESTful查询时的request body差不都是一个东西
+
+举几个例子
+
+```shell
+curl --location --request POST '10.10.10.246:9200/book/noval/_search' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"query": {
+		"match": {
+			"author": "eeee"
+		}
+	}
+}'
+```
+
+相当于
+
+```java
+NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("author", "eeee"));
+articleRepository.search(nativeSearchQueryBuilder.build());
+```
+
+> RESTful对应的`ElasticsearchRepository`方法
+>
+> | RESTful | ElasticsearchRepository |
+> | ------- | ----------------------- |
+> | query       | withQuery  |
+> | aggs | addAggregation |
+>
+> 
+>
+> | RESTful      | QueryBuilders |
+> | ------------ | ------------- |
+> | match_all | QueryBuilders.matchAllQuery()... |
+> | match        | QueryBuilders.matchQuery(String name, Object text)... |
+> | match_phrase | QueryBuilders.matchPhraseQuery(String name, Object text)... |
+> | multi_match  | QueryBuilders.multiMatchQuery(Object text, String... fieldNames)... |
+> | query_string | QueryBuilders.queryStringQuery(String queryString).field(String field)... |
+> | term         | QueryBuilders.termQuery(String name, Object value)... |
+> | range        | QueryBuilders.rangeQuery(String name)... |
+> | bool         | QueryBuilders.boolQuery().must()... |
+>
+> 
+>
