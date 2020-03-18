@@ -57,7 +57,7 @@ http.cors.enabled: true
 http.cors.allow-origin: "*"
 
 cluster.name: group1		# 集群名字
-node.name: master			# 节点明在
+node.name: master			# 节点名字
 node.master: true			# 指定这个节点是否是主节点
 
 network.host: 127.0.0.1		# 绑定本机ip
@@ -67,24 +67,24 @@ slave1节点elasticsearch.yml配置：
 
 ```yaml
 cluster.name: group1		# 集群名字
-node.name: slave1			# 节点明在
+node.name: slave1			# 节点名字
 
 network.host: 127.0.0.1		# 绑定本机ip
 http.port: 9400				# 改变监听端口
 
-discovery.zen.ping.unicast.hosts: ["127.0.0.1"]		# 绑定集群的主节点
+discovery.zen.ping.unicast.hosts: ["127.0.0.1:9200"]		# 绑定集群的主节点
 ```
 
 slave2节点elasticsearch.yml配置：
 
 ```yaml
 cluster.name: group1		# 集群名字
-node.name: slave2			# 节点明在
+node.name: slave2			# 节点名字
 
 network.host: 127.0.0.1		# 绑定本机ip
 http.port: 9600				# 改变监听端口
 
-discovery.zen.ping.unicast.hosts: ["127.0.0.1"]		# 绑定集群的主节点
+discovery.zen.ping.unicast.hosts: ["127.0.0.1:9200"]		# 绑定集群的主节点
 ```
 
 然后先启动主节点在启动从节点就可以了
@@ -117,7 +117,7 @@ discovery.zen.ping.unicast.hosts: ["127.0.0.1"]		# 绑定集群的主节点
 | type | description                                                  |
 | ---- | ------------------------------------------------------------ |
 | text | 用于全文索引的类型，text类型的字段不能用于排序, 也很少用于聚合。会分词，然后进行索引，支持模糊、精确查询，不支持聚合 |
-| keyword | 支持过滤，排序，聚合操作。不进行分词，直接索引，支持模糊、精确查询，支持聚合 |
+| keyword | 用于关键词索引，支持过滤，排序，聚合操作。不进行分词，直接索引，支持模糊、精确查询，支持聚合 |
 | byte | 有符号的8位整数, 范围: [-128 ~ 127] |
 | short | 有符号的16位整数, 范围: [-32768 ~ 32767]|
 | integer| 有符号的64位整数, 范围: [−2^63 ~ 2^63-1] |
