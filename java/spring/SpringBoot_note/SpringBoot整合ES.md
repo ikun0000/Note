@@ -274,6 +274,8 @@ public class ArticleController {
 
 继承了`ElasticsearchRepository`会有一个search方法，该方法传入一个`QueryBuilder`对象，使用`NativeSearchQueryBuilder`可以构建类似于原生HTTP的查询，`QueryBuilders`用于构建不同的查询，例如：match，multi_match，match_phrase，term等RESTful的查询
 
+`ElasticsearchRepository`也可以添加 聚合 过滤器 。。。
+
 ```java
 @Autowired
 ArticleRepository articleRepository;

@@ -545,7 +545,7 @@ curl --location --request POST '10.10.10.246:9200/book/_search' \
 
 
 
-查询所有数据，制定从哪里返回，返回一条数据
+分页查询，`size`指定一页有多少条数据，`from`指定返回哪一页
 
 ```shell
 curl --location --request POST '10.10.10.246:9200/book/_search' \
