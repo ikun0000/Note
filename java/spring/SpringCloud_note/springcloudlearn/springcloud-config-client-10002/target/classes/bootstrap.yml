@@ -1,8 +1,0 @@
-
-spring:
-  cloud:
-    config:
-      name: config-client   # 需要在git上读取的资源名称，不需要后缀名
-      profile: test          # 要从那个配置环境拿
-      label: master         # 从哪个分支获取
-      uri: http://localhost:10001   # config server地址
