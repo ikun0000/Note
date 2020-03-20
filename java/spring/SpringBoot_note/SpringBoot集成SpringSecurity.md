@@ -1,4 +1,4 @@
-### SpringBoot集成Spring Security
+# SpringBoot集成Spring Security
 
 首先导入Spring Security的依赖
 

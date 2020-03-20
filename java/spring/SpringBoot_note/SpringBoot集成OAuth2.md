@@ -1,4 +1,4 @@
-### SpringBoot集成OAuth2
+# SpringBoot集成OAuth2
 
 导入依赖
 

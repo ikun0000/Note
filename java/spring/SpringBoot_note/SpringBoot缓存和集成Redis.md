@@ -1,4 +1,4 @@
-### SpringBoot使用缓存
+# SpringBoot使用缓存
 
 SpringBoot使用缓存首先要在配置类或者住启动类上添加一个开启缓存的注解`@EnableCaching`
 

@@ -1,4 +1,4 @@
-### 扩展SpringMVC
+# 扩展SpringMVC
 
 实现WebMvcConfigurer并标注为配置类
 

@@ -1,4 +1,4 @@
-### SpringBoot使用yml注入实体类
+# SpringBoot使用yml注入实体类
 
 Entity:
 

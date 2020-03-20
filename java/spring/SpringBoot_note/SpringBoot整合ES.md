@@ -1,4 +1,4 @@
-### SpringBoot整合ES
+# SpringBoot整合ES
 
 #### 首先导入es的starter
 

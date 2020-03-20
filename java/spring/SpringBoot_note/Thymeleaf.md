@@ -1,4 +1,4 @@
-### Thymeleaf自动装配
+# Thymeleaf自动装配
 
 #### 找到模板存放位置
 
