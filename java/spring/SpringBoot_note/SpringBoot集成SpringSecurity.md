@@ -36,6 +36,60 @@ Using generated security password: b054b2e4-5360-4f8a-b254-2610e6b2c79d
 
 
 
+SpringSecurity登陆表单
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <title>Spring Security Example </title>
+    </head>
+    <body>
+        <div th:if="${param.error}">
+            Invalid username and password.
+        </div>
+        <div th:if="${param.logout}">
+            You have been logged out.
+        </div>
+        <form th:action="@{/login}" method="post">
+            <div><label> User Name : <input type="text" name="username"/> </label></div>
+            <div><label> Password: <input type="password" name="password"/> </label></div>
+            <div><input type="submit" value="Sign In"/></div>
+        </form>
+    </body>
+</html>
+```
+
+默认情况下登陆失败SpringSecurity会返回到登陆也并在Model设置`param.error`。如果是推出成功后也会跳转到登陆页并在Model添加了`param.logout`
+
+默认情况下SpringSecurity会开启CSRF保护，如果不关闭，要在表单提交时带上CSRF token，只需要在form表单加上一个hidden属性即可
+
+```html
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+```
+
+设置CSRF token保存在cookie中
+
+```java
+@EnableWebSecurity
+public class WebSecurityConfig extends
+        WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) {
+        http
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            );
+    }
+}
+```
+
+
+
+
+
 SpringSecurity的原理是使用过滤器完成验证的，过滤器链大致如下
 
 ![](./img/d.png)
@@ -193,6 +247,27 @@ protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 ```
 
 在内存或者数据库读取用户
+
+
+
+要使用默认的从JDBC验证用户名密码要在数据库有这些表
+
+```sql
+create table users(
+    username varchar_ignorecase(50) not null primary key,
+    password varchar_ignorecase(50) not null,
+    enabled boolean not null
+);
+
+create table authorities (
+    username varchar_ignorecase(50) not null,
+    authority varchar_ignorecase(50) not null,
+    constraint fk_authorities_users foreign key(username) references users(username)
+);
+create unique index ix_auth_username on authorities (username,authority);
+```
+
+
 
 
 
@@ -381,14 +456,14 @@ http.rememberMe()       // 添加记住我功能
 
 ### 权限控制
 
-```
+```java
 http.authorizeRequests()        // 对请求进行认证
-.antMatchers("/level1/*").hasAnyAuthority("level1", "admin")	// 允许一个资源只能有对应劝降的人访问
-.antMatchers("/level2/*").hasAnyAuthority("level2", "admin")
-.antMatchers("/level3/*").hasAnyAuthority("level3", "admin")
-.antMatchers("/", "/index", "/index.html", "/form", "/constraint", "/logout").permitAll()      // 允许放行的URI
-.anyRequest().authenticated()       // 所有请求都要认证
-.and();
+    .antMatchers("/level1/*").hasAnyAuthority("level1", "admin")	// 允许一个资源只能有对应劝降的人访问
+    .antMatchers("/level2/*").hasAnyAuthority("level2", "admin")
+    .antMatchers("/level3/*").hasAnyAuthority("level3", "admin")
+    .antMatchers("/", "/index", "/index.html", "/form", "/constraint", "/logout").permitAll()      // 允许放行的URI
+    .anyRequest().authenticated()       // 所有请求都要认证
+    .and();
 ```
 
 * `hasAnyAuthority(String...)`设置权限列表
@@ -429,3 +504,61 @@ http.exceptionHandling()
 	.accessDeniedHandler(myAccessDeniedHandler);
 ```
 
+
+
+### Spring Security + Thymeleaf
+
+首先导入Spring Security和Thymeleaf的整合包
+
+```xml
+<dependency>
+    <groupId>org.thymeleaf.extras</groupId>
+    <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+    <version>3.0.4.RELEASE</version>
+</dependency>
+```
+
+
+
+[Thymeleaf + Spring Security官方文档]( https://www.thymeleaf.org/doc/articles/springsecurity.html )
+
+[整合包Github地址]( https://github.com/thymeleaf/thymeleaf-extras-springsecurity )
+
+然后再html引入命名空间
+
+```xml
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+```
+
+使用sec标签判断用户是否登陆或者是否有特定角色
+
+```html
+<div sec:authorize="isAuthenticated()">
+  This content is only shown to authenticated users.
+</div>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+  This content is only shown to administrators.
+</div>
+<div sec:authorize="hasRole('ROLE_USER')">
+  This content is only shown to users.
+</div>
+
+<!-- 取出用户名 -->
+<span sec:authentication="name"></span>
+<!-- 获取登陆用户的所有角色 -->
+<span sec:authentication="principal.authorities"></span>
+```
+
+使用CSRF认证时除了自己加一个hidden属性外还可以使用这种方法
+
+```html
+<form method="post" action="/do/something">
+    <sec:csrfInput />
+    Name:<br />
+    <input type="text" name="name" />
+    ...
+</form>
+```
+
+Thymeleaf中使用` #authentication `操控Spring Security中的Authentication对象
