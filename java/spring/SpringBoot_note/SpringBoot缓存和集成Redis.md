@@ -171,6 +171,13 @@ spring:
     host: 10.10.10.246
     database: 0
     jedis:
+#      pool:
+#        max-active: 8
+#        max-wait: 2ms
+#        min-idle: 0
+#        max-idle: 8
+        
+    lettuce:
       pool:
         max-active: 8
         max-wait: 2ms

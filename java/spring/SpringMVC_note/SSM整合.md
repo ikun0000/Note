@@ -179,7 +179,7 @@
 ```properties
 jdbc.driver=com.mysql.jdbc.Driver
 # MySQL8.0+如果不带时区可能会报错
-jdbc.url=jdbc:mysql://10.10.10.246:3306/ssmbuild?useSSL=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+jdbc.url=jdbc:mysql://10.10.10.246:3306/ssm?useSSL=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
 jdbc.username=root
 jdbc.password=123456
 ```
