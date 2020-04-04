@@ -1,5 +1,9 @@
 # SpringBoot集成Shiro
 
+> [知乎文章]( https://zhuanlan.zhihu.com/p/54176956 )
+
+
+
 #### Shiro官方教程
 
 ```she
@@ -156,32 +160,32 @@ shiroFilterFactoryBean.setFilterChainDefinitionMap(filterMap);
 #### 编写接收用户输入的controller
 
 ```java
-    @PostMapping("/login")
-    public String login(String username, String password, String[] remme, Model model) {
-        // 获取当前用户
-        Subject subject = SecurityUtils.getSubject();
-        // 封装用户登陆数据
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
+@PostMapping("/login")
+public String login(String username, String password, String[] remme, Model model) {
+    // 获取当前用户
+    Subject subject = SecurityUtils.getSubject();
+    // 封装用户登陆数据
+    UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
 
-        if (remme != null && remme[0].equals("rememberme")) {
-            usernamePasswordToken.setRememberMe(true);
-        }
-
-        // 执行登陆的方法
-        try {
-            subject.login(usernamePasswordToken);
-        } catch (UnknownAccountException e) {
-            model.addAttribute("msg", "用户名不存在");
-            return "form";
-        } catch (IncorrectCredentialsException e) {
-            model.addAttribute("msg", "密码错误");
-            return "form";
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        }
-
-        return "index";
+    if (remme != null && remme[0].equals("rememberme")) {
+        usernamePasswordToken.setRememberMe(true);
     }
+
+    // 执行登陆的方法
+    try {
+        subject.login(usernamePasswordToken);
+    } catch (UnknownAccountException e) {
+        model.addAttribute("msg", "用户名不存在");
+        return "form";
+    } catch (IncorrectCredentialsException e) {
+        model.addAttribute("msg", "密码错误");
+        return "form";
+    } catch (AuthenticationException e) {
+        e.printStackTrace();
+    }
+
+    return "index";
+}
 ```
 
 
@@ -242,4 +246,21 @@ public String logout() {
     return "index";
 }
 ```
+
+
+
+### 加密
+
+```java
+String password = "123456";
+String salt = new SecureRandomNumberGenerator().nextBytes().toString();
+int times = 2;  // 加密次数：2
+String alogrithmName = "md5";   // 加密算法
+
+String encodePassword = new SimpleHash(alogrithmName, password, salt, times).toString();
+
+System.out.printf("原始密码是 %s , 盐是： %s, 运算次数是： %d, 运算出来的密文是：%s ",password,salt,times,encodePassword);
+```
+
+
 
