@@ -449,3 +449,66 @@ Error: java error: release version 5 not supported
 </plugin>
 ```
 
+
+
+### 编译异常`An API incompatibility was encountered while executing org.apache.maven.plugins:maven-jar-plugin:2.6:jar`
+
+```
+ERROR] Failed to execute goal org.apache.maven.plugins:maven-jar-plugin:2.6:jar (default-jar) on project my-test-utils: Execution default-jar of goal org.apache.maven.plugins:maven-jar-plugin:2.6:jar failed: An API incompatibility was encountered while executing org.apache.maven.plugins:maven-jar-plugin:2.6:jar: java.lang.ExceptionInInitializerError: null
+[ERROR] -----------------------------------------------------
+[ERROR] realm =    plugin>org.apache.maven.plugins:maven-jar-plugin:2.6
+[ERROR] strategy = org.codehaus.plexus.classworlds.strategy.SelfFirstStrategy
+[ERROR] urls[0] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/plugins/maven-jar-plugin/2.6/maven-jar-plugin-2.6.jar
+[ERROR] urls[1] = file:/Users/jeanvaljean/.m2/repository/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar
+[ERROR] urls[2] = file:/Users/jeanvaljean/.m2/repository/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar
+[ERROR] urls[3] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/reporting/maven-reporting-api/2.2.1/maven-reporting-api-2.2.1.jar
+[ERROR] urls[4] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/doxia/doxia-sink-api/1.1/doxia-sink-api-1.1.jar
+[ERROR] urls[5] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/doxia/doxia-logging-api/1.1/doxia-logging-api-1.1.jar
+[ERROR] urls[6] = file:/Users/jeanvaljean/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
+[ERROR] urls[7] = file:/Users/jeanvaljean/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar
+[ERROR] urls[8] = file:/Users/jeanvaljean/.m2/repository/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar
+[ERROR] urls[9] = file:/Users/jeanvaljean/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar
+[ERROR] urls[10] = file:/Users/jeanvaljean/.m2/repository/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar
+[ERROR] urls[11] = file:/Users/jeanvaljean/.m2/repository/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar
+[ERROR] urls[12] = file:/Users/jeanvaljean/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar
+[ERROR] urls[13] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/maven-archiver/2.6/maven-archiver-2.6.jar
+[ERROR] urls[14] = file:/Users/jeanvaljean/.m2/repository/org/apache/maven/shared/maven-shared-utils/0.7/maven-shared-utils-0.7.jar
+[ERROR] urls[15] = file:/Users/jeanvaljean/.m2/repository/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.jar
+[ERROR] urls[16] = file:/Users/jeanvaljean/.m2/repository/org/codehaus/plexus/plexus-utils/3.0.20/plexus-utils-3.0.20.jar
+[ERROR] urls[17] = file:/Users/jeanvaljean/.m2/repository/org/codehaus/plexus/plexus-archiver/2.9/plexus-archiver-2.9.jar
+[ERROR] urls[18] = file:/Users/jeanvaljean/.m2/repository/org/codehaus/plexus/plexus-io/2.4/plexus-io-2.4.jar
+[ERROR] urls[19] = file:/Users/jeanvaljean/.m2/repository/commons-io/commons-io/2.2/commons-io-2.2.jar
+[ERROR] urls[20] = file:/Users/jeanvaljean/.m2/repository/org/apache/commons/commons-compress/1.9/commons-compress-1.9.jar
+[ERROR] Number of foreign imports: 1
+[ERROR] import: Entry[import  from realm ClassRealm[maven.api, parent: null]]
+[ERROR] 
+```
+
+添加以下插件
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.7.0</version>
+            <configuration>
+                <source>1.9</source>
+                <target>1.9</target>
+                <jdkToolchain>
+                    <version>9</version>
+                </jdkToolchain>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.2</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
+[StackOverFlow]( https://stackoverflow.com/questions/46353477/jdk9-and-maven-jar-plugin?r=SearchResults )
+
