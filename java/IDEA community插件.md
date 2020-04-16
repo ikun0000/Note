@@ -29,4 +29,5 @@
 23.    GsonFormat        根据json生成实体类
 24.    MyBatis Log Plugin        查看Mybatis真正执行的完整的SQL语句
 25.    Free Mybatis plugin       快速跳转Mybatis接口和xml
-26.    Alibaba Java Coding Guidelines          阿里巴巴开发规范 
+26.   Alibaba Java Coding Guidelines          阿里巴巴开发规范 
+      1.   jclasslib Bytecod viewer				展示字节码指令
