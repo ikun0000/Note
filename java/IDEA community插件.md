@@ -14,7 +14,6 @@
 24.   Smart Tomcat         社区版的野生tomcat
 25.   MyBatis plugin       Mybatis支持
 30.   Lombok          使用Lombok时不报错
-16.   Background Image Plus     设置IDEA背景图
 17.    CodeGlance      右侧展示代码地图
 18.    Translation     IDEA翻译插件
 19.    Rainbow Brackets        彩虹色括号标记
