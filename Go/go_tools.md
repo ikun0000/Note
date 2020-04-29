@@ -17,6 +17,7 @@
 - [ ] **godef** Go定义
 - [ ] **goreturns** 格式化程序
 - [ ] **golint** 短绒
+- [ ] **govendor** Go依赖管理
 
 
 
@@ -39,6 +40,7 @@
 | godef        | github.com/rogpeppe/godef                      |
 | goreturns    | github.com/sqs/goreturns                       |
 | golint       | golang.org/x/lint/golint                       |
+|  govendor	   |   github.com/kardianos/govendor                |
 
 如果`go get <package address>`安装不了直接去github下载下来放在`$GOPATH/src`下，然后执行`go install <package address>`就可以了
 
@@ -56,6 +58,7 @@ $ set GO111MODULE=on
 $ set GOPROXY=https://mirrors.aliyun.com/goproxy
 # 或者
 $ set GOPROXY=https://goproxy.io
+$ set GOPROXY=https://goproxy.cn
 
 $ go get github.com/kataras/iris/v12@latest
 ```
