@@ -14,8 +14,8 @@
 
 运行一个容器：
 
-```
-# docker run ubuntu:15.10 /bin/echo "hello world"
+```shell
+$ docker run ubuntu:15.10 /bin/echo "hello world"
 ```
 
 run是运行一个容器
@@ -26,8 +26,8 @@ ubuntu:15.10是制定运行的镜像，首先会从本地查找镜像是否存�
 
 
 
-```
-# docker run -i -t ubuntu:15.10 /bin/bash
+```shell
+$ docker run -i -t ubuntu:15.10 /bin/bash
 Dc0050c79503:/# 
 ```
 
@@ -39,20 +39,20 @@ Dc0050c79503:/#
 
  使用以下命令创建一个以进程方式运行的容器 
 
-```
-# docker run -d ubuntu:15.10 /bin/sh -c "while true; do echo hello world; sleep 1; done"
+```shell
+$ docker run -d ubuntu:15.10 /bin/sh -c "while true; do echo hello world; sleep 1; done"
 2b1b7a428627c51ab8810d541d759f072b4fc75487eed05812646b8534a2fe63
 
 // 循环打印Hello World
 // 后面的hash是容器ID
 ```
 
-```
-# docker ps           //加上-a参数是列出所有容器（包括没有运行的）
+```shell
+$ docker ps           //加上-a参数是列出所有容器（包括没有运行的）
 ```
 
-```
-# docker logs 2b1b7a428627c5         //可以是容器ID或者是容器名称（docker ps输出的NAMES列）
+```shell
+$ docker logs 2b1b7a428627c5         //可以是容器ID或者是容器名称（docker ps输出的NAMES列）
 ```
 
 在后台运行ubuntu容器，输出一个容器ID，在终端看不到输出Hello World
@@ -63,8 +63,8 @@ Dc0050c79503:/#
 
 
 
-```
-# docker stop 2b1b7a428627c5         //可以是容器ID或者是容器名称（docker ps输出的NAMES列）
+```shell
+$ docker stop 2b1b7a428627c5         //可以是容器ID或者是容器名称（docker ps输出的NAMES列）
 ```
 
 该命令用来停止一个容器
@@ -75,8 +75,8 @@ Dc0050c79503:/#
 
 用Python Flask运行web应用：
 
-```
-# docker run -d -P training/webapp python app.py
+```shell
+$ docker run -d -P training/webapp python app.py
 ```
 
 -d 表示让容器在后台运行
@@ -91,8 +91,8 @@ Dc0050c79503:/#
 
 
 
-```
-# docker run -d -p 5000:5000 training/webapp python app.py
+```shell
+$ docker run -d -p 5000:5000 training/webapp python app.py
 ```
 
 将容器内的5000端口映射到本机的5000端口
@@ -101,18 +101,18 @@ Dc0050c79503:/#
 
 
 
-```
-# docker port <容器ID或者容器名>
+```shell
+$ docker port <容器ID或者容器名>
 ```
 
 查看指定容器的端口映射情况
 
 
 
-```
-# docker logs -f <容器ID或者容器名>
-# docker top <容器ID或者容器名>
-# docker inspect <容器ID或者容器名>
+```shell
+$ docker logs -f <容器ID或者容器名>
+$ docker top <容器ID或者容器名>
+$ docker inspect <容器ID或者容器名>
 ```
 
 -f 的作用是让docker logs使用像tail -f的命令输出方式
@@ -125,25 +125,38 @@ Dc0050c79503:/#
 
 停用和启用容器：
 
-```
-# docker start <容器名或者容器ID>
-# docker stop <容器名或者容器ID>
+```shell
+$ docker start <容器名或者容器ID>
+$ docker stop <容器名或者容器ID>
 ```
 
 
 
 移除容器：
 
+```shell
+$ docker rm <容器名或者容器ID>
 ```
-# docker rm <容器名或者容器ID>
+
+移除容器（强制）
+```shell
+$ docker rm -f <容器名或者容器ID>
 ```
 
 
 
 进入容器：
 
+```shell
+$ docker exec -it <容器名或ID>  /bin/bash
 ```
-# docker exec -it <容器名或ID>  /bin/bash
+
+
+
+修改容器名
+
+```shell
+$ docker rename <旧的容器名称> <新的容器名称>
 ```
 
 
@@ -152,25 +165,25 @@ Dc0050c79503:/#
 
 查看本地镜像：
 
-```
-# docker images
+```shell
+$ docker images
 ```
 
 
 
 运行一个镜像（加上TAG）
 
-```
-# docker run -t -i ubuntu:15.10 /bin/bash
-# docker run -t -i ubuntu:14.04 /bin/bash  
+```shell
+$ docker run -t -i ubuntu:15.10 /bin/bash
+$ docker run -t -i ubuntu:14.04 /bin/bash  
 ```
 
 
 
 下载镜像：
 
-```
-# docker pull ubuntu:13.10
+```shell
+$ docker pull ubuntu:13.10
 ```
 
 Docker 镜像站（Docker Hub）：https://hub.docker.com/
@@ -179,16 +192,16 @@ Docker 镜像站（Docker Hub）：https://hub.docker.com/
 
 上传镜像：
 
-```
-# docker push <你自己的镜像>
+```shell
+$ docker push <你自己的镜像>
 ```
 
 
 
 搜索镜像：
 
-```
-# docker search httpd
+```shell
+$ docker search httpd
 ```
 
 
@@ -234,16 +247,16 @@ Docker 镜像站（Docker Hub）：https://hub.docker.com/
 
 ##### 设置镜像标签：
 
-```
-# docker tag f1a24979af43 youj/centos:6.7
+```shell
+$ docker tag f1a24979af43 youj/centos:6.7
 ```
 
 
 
 ##### 删除镜像：
 
-```
-# docker rmi -f <镜像名>
+```shell
+$ docker rmi -f <镜像名>
 ```
 
 -f 表示强制删除，同时删除容器
@@ -254,11 +267,11 @@ Docker 镜像站（Docker Hub）：https://hub.docker.com/
 
 网路端口映射：
 
-```
-# docker run -d -P training/webapp python app.py
-# docker run -d -p 5000:5000 training/webapp python app.py
-# docker run -d -p 127.0.0.1:5001:5002 training/webapp python app.py
-# docker run -d -p 127.0.0.1:5000:5000/udp training/webapp python app.py
+```shell
+$ docker run -d -P training/webapp python app.py
+$ docker run -d -p 5000:5000 training/webapp python app.py
+$ docker run -d -p 127.0.0.1:5001:5002 training/webapp python app.py
+$ docker run -d -p 127.0.0.1:5000:5000/udp training/webapp python app.py
 ```
 
 绑定主机端口到容器端口，也可以绑定地址和协议
@@ -271,40 +284,40 @@ Docker 镜像站（Docker Hub）：https://hub.docker.com/
 
 查看端口绑定情况：
 
-```
-# docker port adoring_stonebraker 5001
+```shell
+$ docker port adoring_stonebraker 5001
 ```
 
 
 
 容器命名：
 
-```
-# docker run -d -p 8000:5000 --name mysite training/webapp python app.py
+```shell
+$ docker run -d -p 8000:5000 --name mysite training/webapp python app.py
 ```
 
 
 
 删除容器：
 
-```
-# docker rm <容器名或容器ID>
+```shell
+$ docker rm <容器名或容器ID>
 ```
 
 
 
 复制容器目录：
 
-```
-# docker cp 容器ID:容器目录 主机目录
+```shell
+$ docker cp 容器ID:容器目录 主机目录
 ```
 
 
 
 终止容器进程：
 
-```
-# docker kill -s <信号> <容器ID或者容器名>
+```shell
+$ docker kill -s <信号> <容器ID或者容器名>
 ```
 
 -s指定一个kill的信号，默认KILL（差不多就是kill -l列出来的信号（去掉SIG前缀））
@@ -380,10 +393,10 @@ DockerFile语法：
 
 持久数据容器：
 
-```
-# mkdir data
-# docker create -v $PWD/data:/var/mydata --name data_container ubuntu
-# docker run -it --volume-from data_container ubuntu /bin/bash
+```shell
+$ mkdir data
+$ docker create -v $PWD/data:/var/mydata --name data_container ubuntu
+$ docker run -it --volume-from data_container ubuntu /bin/bash
 ```
 
 首先创建目录
@@ -391,3 +404,32 @@ DockerFile语法：
 然后创建一个数据容器，并且挂在本地目录
 
 最后创建的容器使用--volume-from指定数据容器
+
+
+
+
+
+
+
+# 问题
+
+```shell
+[root@localhost ~]# docker exec -it /bin/bash some-mysql
+Error response from daemon: page not found
+```
+
+修改`/etc/docker/daemon.json`
+
+```json
+{
+    "registry-mirrors": ["https://reg-mirror.giniu.com"],
+    "insecure-registries": ["myregistry.example.com:5000"]
+}
+```
+
+重启docker
+
+```shell
+$ systemctl restart docker
+```
+

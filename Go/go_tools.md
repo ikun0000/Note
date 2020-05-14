@@ -65,3 +65,24 @@ $ go get github.com/kataras/iris/v12@latest
 
 [Goproxy 中国]( https://goproxy.cn/ )
 
+
+
+# Go语言交叉编译
+
+这个功能可以让你在windows系统上编译出的二进制文件是ELF文件，或者在Linux上编译生成的二进制文件是PE文件，要使用交叉编译，要设置环境变量（不建议设置全局的，需要编译时才设置）
+
+```powershell
+# SET GO_ENABLED=0		不使用C语言版本的Go编译器，1.5以后就默认不用C的Go编译器了，除非代码使用的C的函数库
+SET GOOS=linux
+SET GOARCH=amd64
+```
+
+之后正常的`go build`就可以了
+
+| OS      | ARCH          | OS Version                 |
+| ------- | ------------- | -------------------------- |
+| linux   | 386,amd64,arm | Linux 2.6+                 |
+| darwin  | 386,amd64     | OS X (Snow Leopard + Lion) |
+| freebsd | 386,amd64     | FreeBSD 7+                 |
+| windows | 386,amd64     | Windows 2000+              |
+
