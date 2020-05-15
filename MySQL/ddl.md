@@ -201,6 +201,25 @@ Query OK, 0 rows affected, 1 warning (0.04 sec)
 
 
 
+有时候这样创建可能报错，那是因为字段和系统的关键字重合了，推荐使用吧自定义的字段都用` \``括起来（Tab上面那个），比如
+
+```shell
+mysql> CREATE TABLE `employee` (
+    -> `id` BIGINT AUTO_INCREMENT,
+    -> `name` CHAR(20) NOT NULL,
+    -> `introduction` VARCHAR(255) default "",
+    -> `gmt_create` DATETIME default now(),
+    -> `gmt_update` DATETIME default now(),
+    -> `is_delete` TINYINT default 0,
+    -> PRIMARY KEY (`id`)
+    -> ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+Query OK, 0 rows affected, 1 warning (0.04 sec)
+```
+
+其他语句（DDL, DML, DQL, DCL）也是可以这样使用
+
+
+
 ## 删除表
 
 ```shell
