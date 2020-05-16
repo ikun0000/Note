@@ -10,6 +10,29 @@
 
 
 
+### 安装
+
+```shell
+$ yum install docker -y 
+$ systemctl enable docker
+$ systemctl start docker 
+```
+
+
+
+### 导出/导入镜像
+
+```shell
+# 导出镜像到tar.gz
+$ docker  save nginx >/tmp/nginx.tar.gz
+# 从tar.gz导入镜像
+$ docker load < /tmp/nginx.tar.gz
+```
+
+
+
+
+
 #### docker基础
 
 运行一个容器：
@@ -407,7 +430,35 @@ $ docker run -it --volume-from data_container ubuntu /bin/bash
 
 
 
+### Docker网路
 
+获取Docker网路配置
+
+```shell
+[root@localhost ~]$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+262ed25c6361        bridge              bridge              local
+d56141bf8757        host                host                local
+457edc4bceac        none                null                local
+```
+
+DRIVER
+
+* bridge：bridge网路会在物理机网卡上有一个docker 0的虚拟网卡，作为docker的网关，使用bridge就是连接到这块虚拟网卡，通过这块虚拟网卡连接物理网卡访问外网，类似于vmware的NAT模式
+* host：使用host模式后容器就会和宿主机共用一块网卡，类似于vmware的桥接模式，直接桥接到物理网卡
+* none：此时所有网路都得自己配置ip，网卡等，类似于vmware的自定义
+
+
+
+创建一个桥接模式的网络
+
+```shell
+$ docker network create test_net
+```
+
+什么都不指定默认创建一个bridge模式的网路
+
+在创建容器时使用`--network`参数指定容器连接的网路
 
 
 
