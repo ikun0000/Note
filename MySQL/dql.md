@@ -340,7 +340,213 @@ mysql> SELECT * FROM student LIMIT 2, 3;
 
 
 
-## 子查询
+## 多表查询
+
+```
+mysql> desc book;
++-------------+---------------+------+-----+---------+----------------+
+| Field       | Type          | Null | Key | Default | Extra          |
++-------------+---------------+------+-----+---------+----------------+
+| id          | int           | NO   | PRI | NULL    | auto_increment |
+| book_name   | varchar(50)   | NO   |     | NULL    |                |
+| author      | varchar(50)   | NO   |     | NULL    |                |
+| price       | decimal(10,2) | NO   |     | NULL    |                |
+| description | varchar(100)  | YES  |     | NULL    |                |
+| isbn        | varchar(50)   | NO   |     | NULL    |                |
++-------------+---------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> desc student;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | bigint      | NO   | PRI | NULL    | auto_increment |
+| name  | varchar(50) | YES  |     | NULL    |                |
+| age   | tinyint     | NO   |     | NULL    |                |
+| sex   | tinyint     | NO   |     | NULL    |                |
+| math  | tinyint     | YES  |     | 0       |                |
++-------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+```
+
+
+
+### 合并结果集
+
+```sql
+SELECT id, book_name FROM book 
+UNION 
+SELECT id, name FROM student;
+```
+
+这样会把book的id，book_name和student的id，name合并为一个结果集
+
+**使用`UNION`需要多张表返回的对应列的数据类型，列的数量一致**
+
+
+
+直接使用`UNION`时完全相同的行会被去除，如果不想去除使用`UNION ALL`
+
+```sql
+SELECT id, book_name FROM book 
+UNION ALL
+SELECT id, name FROM student;
+```
+
+
+
+### 连接查询
+
+```sql
+mysql> select * from student;
++----+------------+------+
+| id | student_id | name |
++----+------------+------+
+|  0 |         12 | b    |
+|  1 |         11 | a    |
+|  3 |         13 | c    |
++----+------------+------+
+3 rows in set (0.00 sec)
+
+mysql> select * from sc;
++----+-------+
+| id | score |
++----+-------+
+| 10 |    40 |
+| 11 |    20 |
+| 12 |    30 |
++----+-------+
+3 rows in set (0.00 sec)
+
+```
+
+如果直接查询两张表会得到一个笛卡儿积，sc表中的每一列会和student表中的每一列组成新的一列
+
+```sql
+mysql> SELECT * FROM sc, student;
++----+-------+----+------------+------+
+| id | score | id | student_id | name |
++----+-------+----+------------+------+
+| 12 |    30 |  0 |         12 | b    |
+| 11 |    20 |  0 |         12 | b    |
+| 10 |    40 |  0 |         12 | b    |
+| 12 |    30 |  1 |         11 | a    |
+| 11 |    20 |  1 |         11 | a    |
+| 10 |    40 |  1 |         11 | a    |
+| 12 |    30 |  3 |         13 | c    |
+| 11 |    20 |  3 |         13 | c    |
+| 10 |    40 |  3 |         13 | c    |
++----+-------+----+------------+------+
+9 rows in set (0.00 sec)
+
+```
+
+
+
+#### 内连接
+
+```sql
+mysql> SELECT student.id, student_id, name, score FROM student INNER JOIN sc ON student.student_id=sc.id;
++----+------------+------+-------+
+| id | student_id | name | score |
++----+------------+------+-------+
+|  0 |         12 | b    |    30 |
+|  1 |         11 | a    |    20 |
++----+------------+------+-------+
+2 rows in set (0.00 sec)
+
+```
+
+ 也就是在笛卡尔积中查找student.student_id和sc.id相同的行
+
+也可以简写成
+
+```sql
+SELECT student.id, student_id, name, score 
+FROM student, sc 
+WHERE student.student_id=sc.id;
+```
+
+
+
+#### 外连接
+
+
+
+##### 左外连接
+
+```sql
+mysql> SELECT student.id, student_id, name, sc.score FROM student LEFT JOIN sc ON sc.id=student.student_id;
++----+------------+------+-------+
+| id | student_id | name | score |
++----+------------+------+-------+
+|  0 |         12 | b    |    30 |
+|  1 |         11 | a    |    20 |
+|  3 |         13 | c    |  NULL |
++----+------------+------+-------+
+3 rows in set (0.00 sec)
+
+```
+
+使用`LEFT JOIN`时一定会列出`LEFT JOIN`左边那张表的全部内容，然后根据`ON`的条件连接两张表的内容，如果返现右边表没有能匹配左边表的内容则为NULL
+
+
+
+##### 右外连接
+
+```sql
+mysql> SELECT sc.id, score, student.id, name FROM student RIGHT JOIN sc ON sc.id=student.student_id;
++----+-------+------+------+
+| id | score | id   | name |
++----+-------+------+------+
+| 10 |    40 | NULL | NULL |
+| 11 |    20 |    1 | a    |
+| 12 |    30 |    0 | b    |
++----+-------+------+------+
+3 rows in set (0.00 sec)
+
+```
+
+右连接和左连接相反，他会先输出`RIGHT JOIN`右边表的所有行，然后就是根据`ON`条件用左表内容连接到右表上，如果`ON`没有匹配到左表对应的内容则为NULL
+
+
+
+##### 全外连接
+
+全外连接就是左右不满做`ON`条件都列出来，但是MySQL不支持，但是可以用`UNION`配合`LEFT JOIN`,`RIGHT JOIN`模拟
+
+```sql
+mysql> SELECT student.id, student_id, name, score FROM student LEFT JOIN sc ON student.student_id=sc.id
+    -> UNION
+    -> SELECT student.id, student_id, name, score FROM student RIGHT JOIN sc ON student.student_id=sc.id;
++------+------------+------+-------+
+| id   | student_id | name | score |
++------+------------+------+-------+
+|    0 |         12 | b    |    30 |
+|    1 |         11 | a    |    20 |
+|    3 |         13 | c    |  NULL |
+| NULL |       NULL | NULL |    40 |
++------+------------+------+-------+
+4 rows in set (0.00 sec)
+
+```
+
+
+
+#### 自然连接
+
+```sql
+mysql>  SELECT student.id, student_id, name, score FROM student NATURAL JOIN sc;
+Empty set (0.00 sec)
+
+```
+
+使用`NATURAL JOIN`他会自动去识别条件，即名字相同的列作为`ON`的条件
+
+
+
+### 子查询
 
 ```sql
 mysql> SELECT * FROM student WHERE id IN (SELECT id FROM student WHERE math>=80);
@@ -358,3 +564,4 @@ mysql> SELECT * FROM student WHERE id IN (SELECT id FROM student WHERE math>=80)
 ```
 
 可以使用`IN`来嵌套另外一个SQL语句
+
