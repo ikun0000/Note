@@ -372,6 +372,24 @@ mysql> desc student;
 
 
 
+### 表别名
+
+```sql
+mysql> SELECT stu.id, stu.name, s.score FROM student stu INNER JOIN sc s ON stu.student_id=s.id;
++----+------+-------+
+| id | name | score |
++----+------+-------+
+|  1 | a    |    20 |
+|  0 | b    |    30 |
++----+------+-------+
+2 rows in set (0.00 sec)
+
+```
+
+只需要在`FROM`后面的表名跟上别名就可以在语句任意位置使用别名
+
+
+
 ### 合并结果集
 
 ```sql
@@ -468,6 +486,8 @@ FROM student, sc
 WHERE student.student_id=sc.id;
 ```
 
+其中`FROM`不一定要是表名，也可以是一个`SELECT`语句，那么他会把`SELECT`语句查询结果当成一张表。`FROM`后面的多张表可以是同一张表
+
 
 
 #### 外连接
@@ -543,6 +563,20 @@ Empty set (0.00 sec)
 ```
 
 使用`NATURAL JOIN`他会自动去识别条件，即名字相同的列作为`ON`的条件
+
+
+
+#### 多个表连接
+
+```sql
+SELECT t1.field1, t1.field2, t2.field3, t3.field4
+FROM table1 t1 LEFT JOIN t2 ON t1.field5=t2.field5
+			   LEFT JOIN t1 ON t1.field7=t1.field1
+               LEFT JOIN t3 ON t2.field6=t3.field6
+WHERE t1.fieldx<121;
+```
+
+
 
 
 
