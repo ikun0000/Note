@@ -121,3 +121,58 @@ Docker安装时带上下面参数设置编码为utf8
 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
+
+
+# 查看数据库支持的引擎
+
+```sql
+mysql> show engines;
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+| FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| MRG_MYISAM         | YES     | Collection of identical MyISAM tables                          | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
++--------------------+---------+----------------------------------------------------------------+--------------+------+------------+
+9 rows in set (0.00 sec)
+
+```
+
+
+
+# 查看默认引擎
+
+```sql
+mysql> show variables like '%storage_engine%';
++---------------------------------+-----------+
+| Variable_name                   | Value     |
++---------------------------------+-----------+
+| default_storage_engine          | InnoDB    |
+| default_tmp_storage_engine      | InnoDB    |
+| disabled_storage_engines        |           |
+| internal_tmp_mem_storage_engine | TempTable |
++---------------------------------+-----------+
+4 rows in set (0.00 sec)
+
+```
+
+
+
+# 两种主要引擎对比
+
+| 对比项   | MyISAM                                                 | InnoDB                                                       |
+| -------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| 主外键   | 不支持                                                 | 支持                                                         |
+| 事务     | 不支持                                                 | 支持                                                         |
+| 行表锁   | 表锁，即使操作一行记录也会锁住整个表，不适合高并发操作 | 行锁，操作时只锁某一行，不对其他行有影响，适合高并发操作     |
+| 缓存     | 只缓存索引，不缓存真实数据                             | 不仅缓存索引还要缓存真实数据，对内存要求较高，而且内存大小对性能有决定性影响 |
+| 表空间   | 小                                                     | 大                                                           |
+| 关注点   | 性能                                                   | 事务                                                         |
+| 默认安装 | Y                                                      | Y                                                            |
+

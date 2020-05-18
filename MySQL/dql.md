@@ -294,7 +294,7 @@ mysql> SELECT sex, sum(math) FROM student GROUP BY sex HAVING sum(math) > 260;
 ### 执行顺序
 
 ```
-SELECT  ->  FROM  ->  WHERE  ->  GROUP BY  ->  HAVING  ->  ORDER BY  ->  LIMIT
+FROM  ->  SELECT  ->  WHERE  ->  GROUP BY  ->  HAVING  ->  ORDER BY  ->  LIMIT
 ```
 
 
@@ -416,6 +416,33 @@ SELECT id, name FROM student;
 
 ### 连接查询
 
+![SQL JOINS]( https://janikvonrotz.ch/wp-content/uploads/2015/07/SQL-Join-925x1024.png )
+
+```sql
+-- 内连接
+SELECT * FROM a INNER JOIN b ON a.key = b.key
+
+-- 左连接
+SELECT * FROM a LEFT JOIN b ON a.key = b.key
+
+-- 右连接
+SELECT * FROM a RIGHT JOIN b ON a.key = b.key
+
+-- 左外连接
+SELECT * FROM a LEFT JOIN b ON a.key = b.key WHERE b.key IS NULL
+
+-- 右外连接
+SELECT * FROM a RIGHT JOIN b ON a.key = b.key WHERE a.key IS NULL
+
+-- 外连接
+SELECT * FROM a FULL OUTER JOIN b ON a.key = b.key
+
+-- 全外连接
+SELECT * FROM a FULL OUTER JOIN b ON a.key = b.key WHERE a.key IS NULL OR b.key IS NULL
+```
+
+
+
 ```sql
 mysql> select * from student;
 +----+------------+------+
@@ -532,9 +559,29 @@ mysql> SELECT sc.id, score, student.id, name FROM student RIGHT JOIN sc ON sc.id
 
 
 
+##### 外连接
+
+```sql
+SELECT <public field> FROM a LEFT JOIN b ON a.key=b.key WHERE b.key IS NULL
+UNION 
+SELECT <public field> FROM a RIGHT JOIN b ON a.key=b.key WHERE a.key IS NULL
+UNION 
+SELECT <public field> FROM a INNER JOIN b ON a.key=b.key
+-- 左外加右外加内连接
+```
+
+
+
 ##### 全外连接
 
 全外连接就是左右不满做`ON`条件都列出来，但是MySQL不支持，但是可以用`UNION`配合`LEFT JOIN`,`RIGHT JOIN`模拟
+
+```sql
+SELECT <public field> FROM a LEFT JOIN b ON a.key=b.key WHERE b.key IS NULL
+UNION 
+SELECT <public field> FROM a RIGHT JOIN b ON a.key=b.key WHERE a.key IS NULL
+-- 左外加右外
+```
 
 ```sql
 mysql> SELECT student.id, student_id, name, score FROM student LEFT JOIN sc ON student.student_id=sc.id
