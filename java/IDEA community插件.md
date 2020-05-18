@@ -12,13 +12,14 @@
 16.   RestfulToolkit       一套 RESTful 服务开发辅助工具集。
 19.   J2EECfgFile         生成J2EE配置文件
 24.   Smart Tomcat         社区版的野生tomcat
-25.   MyBatis plugin       Mybatis支持
-30.   Lombok          使用Lombok时不报错
-17.    CodeGlance      右侧展示代码地图
-18.    Translation     IDEA翻译插件
-19.    Rainbow Brackets        彩虹色括号标记
-20.    Grep Console        日志着色插件
-21.    Statistic         代码统计插件
-26.   Alibaba Java Coding Guidelines          阿里巴巴开发规范 
-27.   jclasslib Bytecod viewer				展示字节码指令
-19.   Alibaba Cloud Toolkit                    Alibaba开发套件（直接连接阿里云，ssh工具等）
+25.   Free MyBatis plugin      生成mapper xml文件，快速从代码跳转到mapper及从mapper返回代码，mybatis自动补全及语法错误提示，集成mybatis generator gui界面
+10.   Lombok          使用Lombok时不报错
+11.   CodeGlance      右侧展示代码地图
+12.   Translation     IDEA翻译插件
+13.   Rainbow Brackets        彩虹色括号标记
+14.   Grep Console        日志着色插件
+15.   Statistic         代码统计插件
+16.   Alibaba Java Coding Guidelines          阿里巴巴开发规范 
+17.   jclasslib Bytecod viewer				展示字节码指令
+18.   Alibaba Cloud Toolkit                    Alibaba开发套件（直接连接阿里云，ssh工具等）
+19.   MybatisCodel       Mybatis支持
