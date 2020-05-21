@@ -129,6 +129,14 @@ Query OK, 0 rows affected (0.00 sec)
 
 
 
+## 刷新权限
+
+在修改完权限之后要刷新一次权限
+
+```sql
+FLUSH PRIVILEGES;
+```
+
 
 
 ## 删除用户
