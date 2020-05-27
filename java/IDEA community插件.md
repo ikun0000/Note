@@ -22,4 +22,4 @@
 16.   Alibaba Java Coding Guidelines          阿里巴巴开发规范 
 17.   jclasslib Bytecod viewer				展示字节码指令
 18.   Alibaba Cloud Toolkit                    Alibaba开发套件（直接连接阿里云，ssh工具等）
-19.   MybatisCodel       Mybatis支持
+19.   MybatisCodeHelperPro       Mybatis支持
