@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>模板语法</title>
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <!-- 插值 -->
+    <!-- 文本 -->
+    <div id="app">
+        <span>Message: {{ msg }}</span><br>
+        <span v-once>这个将不会改变: {{ msg }}</span><br>
+
+        <!-- 原始 HTML -->
+        <p>Using mustaches: {{ rawHtml }}</p>
+        <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+
+        <!-- Attribute -->
+        <div v-bind:id="dynamicId"></div>
+        <button v-bind:disabled="isButtonDisabled">Button</button>
+
+        <!-- 使用 JavaScript 表达式 -->
+        <p>{{ number + 1 }}</p>
+        <p>{{ ok ? 'YES' : 'NO' }}</p>
+        <p>{{ message.split('').reverse().join('') }}</p>
+        <div v-bind:id="'list-' + id"></div>
+
+    </div>
+
+    
+    <!-- 指令 -->
+    <div id="app-2">
+        <p v-if="seen">现在你看到我了</p>
+
+        <!-- 参数 -->
+        <a v-bind:href="url">vue.js</a><br>
+        <a v-on:click="doSomething">Click me</a><br>
+
+        <!-- 动态参数 -->
+        <!--
+        注意，参数表达式的写法存在一些约束，如之后的“对动态参数表达式的约束”章节所述。
+        -->
+        <a v-bind:[attribute]="url">动态参数</a><br>
+        <a v-on:[event]="doSomething">...</a>
+    </div>
+
+    <!-- 修饰符 -->
+    <div id="app-3">
+        <form v-on:submit.prevent="onSubmit">
+            <input type="submit" value="submit">
+        </form>
+    </div>
+
+    <!-- 缩写 -->
+    <div id="app-4">
+        <!-- v-bind 缩写 -->
+        <!-- 完整语法 -->
+        <a v-bind:href="url">完整语法</a>
+
+        <!-- 缩写 -->
+        <a :href="url">缩写</a>
+
+        <!-- 动态参数的缩写 (2.6.0+) -->
+        <a :[key]="url">动态参数的缩写</a>
+
+
+        <!-- v-on 缩写 -->
+        <!-- 完整语法 -->
+        <a v-on:click="doSomething">完整语法</a>
+
+        <!-- 缩写 -->
+        <a @click="doSomething">缩写</a>
+
+        <!-- 动态参数的缩写 (2.6.0+) -->
+        <a @[event]="doSomething">动态参数的缩写</a>
+    </div>
+
+
+    <script>
+        // 插值
+        var app = new Vue({
+            el: '#app',
+            data: {
+                msg: 'Hello',
+                rawHtml: "<span style='color: red'>This should be red.</span>",
+                dynamicId: "example",
+                isButtonDisabled: false,
+                number: 10,
+                ok: false,
+                message: "message",
+                id: 22
+            }
+        });
+
+        
+        // 指令
+        var app2 = new Vue({
+            el: '#app-2',
+            data: {
+                seen: true,
+                url: "https://cn.vuejs.org",
+                attribute: "href",
+                event: "click"
+            },
+            methods: {
+                doSomething: function() {
+                    alert("doSomething");
+                }
+            }
+        });
+
+        
+        // 修饰符
+        var app3 = new Vue({
+            el: '#app-3',
+            methods: {
+                onSubmit: function() {
+                    alert("onSubmit");
+                }
+            }
+        });
+        
+
+        // 缩写
+        var app4 = new Vue({
+            el: '#app-4',
+            data: {
+                url: "https://cn.vuejs.org",
+                key: "href",
+                event: "click"
+            },
+            methods: {
+                doSomething: function() {
+                    alert("doSomething");
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>

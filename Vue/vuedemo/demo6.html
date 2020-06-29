@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>条件渲染</title>
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <h1 v-if="awesome">Vue is awesome!</h1>
+
+        <h1 v-if="awesome">Vue is awesome!</h1>
+        <h1 v-else>Oh no 😢</h1>
+
+
+        <div v-if="Math.random() > 0.5">
+            Now you see me
+        </div>
+        <div v-else>
+            Now you don't
+        </div>
+
+
+        <div v-if="type === 'A'">A</div>
+        <div v-else-if="type === 'B'">B</div>
+        <div v-else-if="type === 'C'">C</div>
+        <div v-else>Not A/B/C</div>
+
+
+        <h1 v-show="ok">Hello!</h1>
+    </div>
+
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                awesome: true,
+                type: 'B',
+                ok: true
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,5 +1,9 @@
 # SpringBoot集成OAuth2
 
+> 参考
+>
+> [SpringBoot 整合 oauth2（三）实现 token 认证]( https://www.jianshu.com/p/19059060036b )
+
 导入依赖
 
 ```xml
@@ -31,6 +35,51 @@
 public class AuthorizationServerConfig extends WebSecurityConfigurerAdapter {
 }
 ```
+
+这里也可以单独开一个配置类继承 `AuthorizationServerConfigurerAdapter ` 然后实现 `public void configure(ClientDetailsServiceConfigurer clients)` 或者使用自定义的用户认证来认证用户
+
+> ```java
+> @Configuration
+> @EnableAuthorizationServer
+> public class MyAuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+> 
+> 
+>     @Autowired
+>     private AuthenticationManager authenticationManager;
+> 
+>     @Autowired
+>     private UserDetailsService userDetailsService;
+> 
+>     @Override
+>     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+>         super.configure(security);
+>     }
+> 
+>     /**
+>      * 客户端配置（给谁发令牌）
+>      * @param clients
+>      * @throws Exception
+>      */
+>     @Override
+>     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+>         clients.inMemory().withClient("internet_plus")
+>                 .secret("internet_plus")
+>                 //有效时间 2小时
+>                 .accessTokenValiditySeconds(72000)
+>                 //密码授权模式和刷新令牌
+>                 .authorizedGrantTypes({"refresh_token","password"})
+>                 .scopes( "all");
+>     }
+> 
+>     @Override
+>     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+>         endpoints
+>                 .authenticationManager(authenticationManager)
+>                 .userDetailsService(userDetailsService);
+>         }
+>     }
+> }
+> ```
 
 
 
@@ -141,6 +190,41 @@ Response response = client.newCall(request).execute();
 public class ResourceServerConfig {
 }
 ```
+
+在这里面继承 `ResourceServerConfigurerAdapter ` 类，在重写 `public void configure(HttpSecurity http)` 方法用于控制资源访问权限。
+
+> ```java
+> @Configuration
+> @EnableResourceServer
+> public class MyResourceServerConfig extends ResourceServerConfigurerAdapter {
+> 
+>     @Autowired
+>     private MyAuthenticationSuccessHandler myAuthenticationSuccessHandler;
+>     @Autowired
+>     private MyAuthenticationFailHandler myAuthenticationFailHandler;
+>     @Override
+>     public void configure(HttpSecurity http) throws Exception {
+>         //表单登录 方式
+>         http.formLogin()
+>                 .loginPage("/authentication/require")
+>                 //登录需要经过的url请求
+>                 .loginProcessingUrl("/authentication/form")
+>                 .successHandler(myAuthenticationSuccessHandler)
+>                 .failureHandler(myAuthenticationFailHandler);
+> 
+>         http
+>                 .authorizeRequests()
+>                 .antMatchers("/user/*")
+>                 .authenticated()
+>                 .antMatchers("/oauth/token").permitAll()
+>                 .anyRequest()
+>                 .permitAll()
+>                 .and()
+>                 //关闭跨站请求防护
+>                 .csrf().disable();
+>     }
+> }
+> ```
 
 定义资源
 

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>事件处理</title>
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+</head>
+
+<body>
+    <!-- 事件处理 -->
+    <div id="example-1">
+        <button v-on:click="counter += 1">Add 1</button>
+        <p>The button above has been clicked {{ counter }} times</p>
+    </div>
+
+
+    <!-- 事件处理方法 -->
+    <div id="example-2">
+        <!-- `greet` 是在下面定义的方法名 -->
+        <button v-on:click="greet">Greet</button>
+    </div>
+
+
+    <!-- 内联处理器中的方法 -->
+    <div id="example-3">
+        <button v-on:click="say('hi')">Say hi</button>
+        <button v-on:click="say('what')">Say what</button>
+    </div>
+
+
+    <script>
+        var example1 = new Vue({
+            el: '#example-1',
+            data: {
+                counter: 0
+            }
+        });
+
+        var example2 = new Vue({
+            el: '#example-2',
+            data: {
+                name: 'Vue.js'
+            },
+            // 在 `methods` 对象中定义方法
+            methods: {
+                greet: function(event) {
+                    // `this` 在方法里指向当前 Vue 实例
+                    alert('Hello ' + this.name + '!');
+                    // `event` 是原生 DOM 事件
+                    if (event) {
+                        alert(event.target.tagName);
+                    }
+                } 
+            }
+        });
+
+
+        new Vue({
+            el: '#example-3',
+            methods: {
+                say: function(message) {
+                    alert(message);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
