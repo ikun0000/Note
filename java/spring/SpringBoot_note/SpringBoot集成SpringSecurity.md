@@ -524,6 +524,8 @@ http.exceptionHandling()
 
 [整合包Github地址]( https://github.com/thymeleaf/thymeleaf-extras-springsecurity )
 
+[spring security CSRF防护]( https://blog.csdn.net/yjclsx/article/details/80349906 )
+
 然后再html引入命名空间
 
 ```xml
@@ -562,3 +564,39 @@ http.exceptionHandling()
 ```
 
 Thymeleaf中使用` #authentication `操控Spring Security中的Authentication对象
+
+也可以在 `<form>` 中这样写
+
+```html
+<input type=“hidden” name=“${_csrf.parameterName}” value=“${_csrf.token}” /> 
+```
+
+如果使用AJAX提交表单则可以在 `<meta>` 中获取令牌然后再AJAX请求中提提交
+
+ ```html
+<html>
+    <head>
+        <meta name=“_csrf” content=“${_csrf.token}” />
+        <meta name=“_csrf_header” content=“${_csrf.headerName}” />
+    </head>
+    
+    <body>
+        <!-- TODO -->
+        <script>
+        	var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            $.ajax({
+                url:url,
+                type:'POST',
+                async:false,
+                dataType:'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);  //发送请求前将csrfToken设置到请求头中
+                },
+                success:function(data,textStatus,jqXHR){
+                }
+            });
+        </script>
+    </body>
+</html>
+ ```
