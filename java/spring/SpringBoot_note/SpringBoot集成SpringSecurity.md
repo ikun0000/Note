@@ -506,6 +506,71 @@ http.exceptionHandling()
 
 
 
+除了在配置类中使用还可以使用注解实现，首先要在配置类中开启注解
+
+```java
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class MySecurityConfig extends WebSecurityConfigurerAdapter {
+   ...
+}
+```
+
+然后再 ` *UserDetailService* ` 中给用户添加角色或权限
+
+```java
+@Configuration
+public class MyUserDetailService implements UserDetailsService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // 模拟一个用户，替代数据库获取逻辑
+        MyUser user = new MyUser();
+        user.setUserName(username);
+        user.setPassword(this.passwordEncoder.encode("123456"));
+
+        // 判断是什么用户并赋予对应的权限
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (StringUtils.equalsIgnoreCase("root", username)) {
+            authorities = AuthorityUtils.commaSeparatedStringToAuthorityList("admin");
+        } else {
+            authorities = AuthorityUtils.commaSeparatedStringToAuthorityList("test");
+        }
+        return new User(username, user.getPassword(), user.isEnabled(),
+                user.isAccountNonExpired(), user.isCredentialsNonExpired(),
+                user.isAccountNonLocked(), authorities);
+    }
+}
+```
+
+在Controller中使用 `@PreAuthorize` 判断权限，如果判断角色那么就要把 `hasAuthority(...)` 换成 `hasRole('ROLE_USER')` 
+
+```java
+@GetMapping("/auth/admin")
+@PreAuthorize("hasAuthority('admin')")
+public String adminPage() {
+    return "admin page";
+}
+```
+
+`@PreAuthorize` 可以填写spEL表达式，比如可以验证表单提交的长度
+
+```java
+@PreAuthorize("hasRole('ROLE_USER') and #form.note.length() <= 1000 or hasRole('ROLE_VIP')")
+```
+
+这里要求如果是 `ROLE_USER` 用户填写表单时 `note` 字数小于1000，如果是 `ROLE_VIP` 则没有字数限制 
+
+除了 `@PreAuthorize` 还可以使用 `@PostAuthorize` 在方法执行完后检查返回值
+
+```java
+@PostAuthorize("returnObject.user.userName == userList.username")
+```
+
+
+
 ### Spring Security + Thymeleaf
 
 首先导入Spring Security和Thymeleaf的整合包
