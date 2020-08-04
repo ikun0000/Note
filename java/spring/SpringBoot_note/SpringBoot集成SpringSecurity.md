@@ -98,6 +98,35 @@ SpringSecurity的原理是使用过滤器完成验证的，过滤器链大致如
 
 ### 自定义用户认证
 
+#### 从内存中设置用户名密码
+
+从内存中读取用户信息要实现`WebSecurityConfigurerAdapter`的签名为`configure(AuthenticationManagerBuilder auth)`的方法，其中使用`inMemoryAuthentication()`设置从内存中用户信息，然后使用签名为`withUser(UserDetails userDetails)`的方法设置用户信息
+
+```java
+@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.inMemoryAuthentication()
+        .withUser(new User("root",
+                           passwordEncoder.encode("123456"),
+                           true,
+                           true,
+                           true,
+                           true,
+                           AuthorityUtils.commaSeparatedStringToAuthorityList("USER_ADMIN")))
+        .withUser(new User("user",
+                           passwordEncoder.encode("654321"),
+                           true,
+                           true,
+                           true,
+                           true,
+                           AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER")));
+}
+```
+
+
+
+#### 实现`UserDetailsService`
+
 首先实现`UserDetailsService`接口重写`loadUserByUsername`的用户认证逻辑
 
 这个方法返回`UserDetails`接口，这里返回`org.springframework.security.core.userdetails.User`，是他的一个实现类，注意不要导错包
@@ -269,10 +298,6 @@ create unique index ix_auth_username on authorities (username,authority);
 
 
 
-
-
-
-
 ### 退出设置
 
 ```java
@@ -283,8 +308,6 @@ http.logout()           // 定义注销
 	.clearAuthentication(true);
 //  .logoutSuccessUrl(LogoutSuccessHandler)   // 退出成功后的handler
 ```
-
-
 
 
 
@@ -633,7 +656,7 @@ Thymeleaf中使用` #authentication `操控Spring Security中的Authentication�
 也可以在 `<form>` 中这样写
 
 ```html
-<input type=“hidden” name=“${_csrf.parameterName}” value=“${_csrf.token}” /> 
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 ```
 
 如果使用AJAX提交表单则可以在 `<meta>` 中获取令牌然后再AJAX请求中提提交
