@@ -779,3 +779,219 @@ GET /{index}/{type}/_search
 }
 ```
 
+
+
+## 高亮匹配到的内容
+
+有时会在ES中放置一些文章，然后web应用提供关键字搜索，用用户输入的关键字去ES中查询符合的文章并把对应的关键字使用 `<em></em>`标签高亮显示，那么需要在 `query` 同级之下添加一个 `highlight`
+
+```json
+{
+    "query": {
+        ...
+    },
+    "highlight" : {
+        "pre_tags" : ["<tag1>", "<tag2>"],
+        "post_tags" : ["</tag1>", "</tag2>"],
+        "fields" : {
+            "content" : {}
+        }
+    }
+}
+```
+
+`pre_tags` 是标记开始的标签，`post_tags` 是结束标签，`pre_tags` 和 `post_tags` 一一对应
+
+例如
+
+```http
+GET /megacorp/employee/_search HTTP/1.1
+Host: 10.10.10.246:9200
+Content-Type: application/json
+
+{
+    "query": {
+        "match_phrase": {
+            "about": "rock climbing"
+        }
+    },
+    "highlight": {
+        "fields": {
+            "about": {}
+        }
+    }
+}
+```
+
+response
+
+```json
+{
+    "took": 95,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 1,
+            "relation": "eq"
+        },
+        "max_score": 1.4167401,
+        "hits": [
+            {
+                "_index": "megacorp",
+                "_type": "employee",
+                "_id": "1",
+                "_score": 1.4167401,
+                "_source": {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "age": 25,
+                    "about": "I love to go rock climbing",
+                    "interests": [
+                        "sports",
+                        "music"
+                    ]
+                },
+                "highlight": {
+                    "about": [
+                        "I love to go <em>rock</em> <em>climbing</em>"
+                    ]
+                }
+            }
+        ]
+    }
+}
+```
+
+
+
+## 查询方式总结
+
+* **`match_all` 查询**
+
+  `match_all` 查询简单的匹配所有文档。在没有指定查询方式时，它是默认的查询： 
+
+  ```json
+  { "match_all": {}}
+  ```
+
+* **`match` 查询**
+
+  无论你在任何字段上进行的是全文搜索还是精确查询，`match` 查询是你可用的标准查询。如果你在一个全文字段上使用 `match` 查询，在执行查询前，它将用正确的分析器去分析查询字符串：
+
+  ```json
+  { "match": { "tweet": "About Search" }}
+  ```
+
+  如果在一个精确值的字段上使用它，例如数字、日期、布尔或者一个 `not_analyzed` 字符串字段，那么它将会精确匹配给定的值：
+
+  ```json
+  { "match": { "age":    26           }}
+  { "match": { "date":   "2014-09-01" }}
+  { "match": { "public": true         }}
+  { "match": { "tag":    "full_text"  }}
+  ```
+
+* **`multi_match` 查询**
+
+  `multi_match` 查询可以在多个字段上执行相同的 `match` 查询：
+
+  ```json
+  {
+      "multi_match": {
+          "query":    "full text search",
+          "fields":   [ "title", "body" ]
+      }
+  }
+  ```
+
+* **`range` 查询**
+
+  `range` 查询找出那些落在指定区间内的数字或者时间： 
+
+  ```json
+  {
+      "range": {
+          "age": {
+              "gte":  20,
+              "lt":   30
+          }
+      }
+  }
+  ```
+
+  被允许的操作符如下：
+
+  - **`gt`**
+
+    大于
+
+  - **`gte`**
+
+    大于等于
+
+  - **`lt`**
+
+    小于
+
+  - **`lte`**
+
+    小于等于
+
+* **`term` 查询**
+
+  `term` 查询被用于精确值匹配，这些精确值可能是数字、时间、布尔或者那些 `not_analyzed` 的字符串：
+
+  ```json
+  { "term": { "age":    26           }}
+  { "term": { "date":   "2014-09-01" }}
+  { "term": { "public": true         }}
+  { "term": { "tag":    "full_text"  }}
+  ```
+
+* **`terms` 查询**
+
+  `terms` 查询和 `term` 查询一样，但它允许你指定多值进行匹配。如果这个字段包含了指定值中的任何一个值，那么这个文档满足条件：
+
+  ```json
+  { "terms": { "tag": [ "search", "full_text", "nosql" ] }}
+  ```
+
+* **`exists` 和 `missing` 查询**
+
+  `exists` 查询和 `missing` 查询被用于查找那些指定字段中有值 (`exists`) 或无值 (`missing`) 的文档。这与SQL中的 `IS_NULL` (`missing`) 和 `NOT IS_NULL` (`exists`) 在本质上具有共性：
+
+  ```json
+  {
+      "exists":   {
+          "field":    "title"
+      }
+  }
+  ```
+  
+* **`bool` 查询**
+
+  `bool` 查询允许你用关系连接上面所有的查询语句
+
+   ```json
+  {
+     "bool" : {
+        "must" :     [
+            这里是必须所有都匹配的，类似于AND
+        ],
+        "should" :   [
+            这里是只需要匹配一个就好的，类似于OR
+        ],
+        "must_not" : [
+            这里是不能有匹配到的，类似于NOT
+        ],
+     }
+  }
+   ```
+
+

@@ -4,8 +4,6 @@
 
 ## 索引操作
 
-
-
 ### 添加索引
 
 往 Elasticsearch 添加数据时需要用到 *索引* —— 保存相关数据的地方。 索引实际上是指向一个或者多个物理 *分片* 的 *逻辑命名空间*。添加索引的格式如下
@@ -15,12 +13,72 @@ PUT /{index}
 {
     "settings": { ... any settings ... },
     "mappings": {
-        "type_one": { ... any mappings ... },
+        "type_one": {
+        	"properties": {
+        		"field name 1": {
+        			"type": "type name",
+        			"analyzer": "分析器",
+        			"stopwords": ["停用词1", "停用词2", ...],
+        			"format": "格式",
+        			"fielddata": "true|false"
+        		},
+        		"field name 2": {
+        			"type": "type name",
+        			"analyzer": "语言分析器",
+        			"stopwords": ["停用词1", "停用词2", ...],
+        			"format": "格式",
+        			"fielddata": "true|false"
+        		},
+        		...
+        	}
+        },
         "type_two": { ... any mappings ... },
         ...
     }
 }
 ```
+
+语言分析器可以让你在特定语言环境下搜索做些优化，比如英文会去掉一些复数，at，or之类的，还可以识别错别字，现在的话 `analyzer` 使用 `english`、`chinese` 、`french`、`german` 和 `spanish`应该足够了。`stopwords` 用于标记搜索时停用那些词，因为有些词是起语气词，这些词对搜索没有用，所以屏蔽掉以提高精度。如果这个字段是`text` 类型的话 `fielddata` 设置为true之后，那么就可以被聚合计算，否则会报错。
+
+> 这对中文有一个ik分词器，需要自己安装，然后就可以在`analyzer` 中使用ik分词器了
+>
+> [elasticsearch-analysis-ik]( https://github.com/medcl/elasticsearch-analysis-ik )
+
+例如
+
+```shell
+curl --location --request PUT '10.10.10.246:9200/people' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+	"settings": {
+		"number_of_shards": 3,
+		"number_of_replicas": 0
+	},
+	"mappings": {
+		"man": {
+			"properties": {
+				"name": {
+					"type": "text"
+				},
+				"country": {
+					"type": "keyword"
+				},
+				"age": {
+					"type": "integer"
+				},
+				"date": {
+					"type": "date",
+					"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+				}
+			}
+		}
+	}
+}'
+```
+
+这是创建一个people索引并且创建一个man的类型并且设置了字段和类型。
+
+
 
 在包含一个空节点的集群内创建名为 `blogs` 的索引，索引在默认情况下会被分配5个主分片， 但是为了演示目的，我们将分配3个主分片和一份副本（每个主分片拥有一个副本分片）：
 
