@@ -23,6 +23,41 @@ spring:
 
 > 注意这里的端口是9300的数据端口，不是9200
 
+随着ES和spring-data-elasticsearch版本的迭代，上面的配置可能不能用了，如果测试是出现以下异常
+
+```
+org.springframework.dao.DataAccessResourceFailureException: Timeout connecting to [localhost/127.0.0.1:9200]; nested exception is java.lang.RuntimeException: Timeout connecting to [localhost/127.0.0.1:9200]
+```
+
+那么上面的配置失效，需要自己配置 `RestHighLevelClient` ，如下
+
+```java
+package com.example.demo.config;
+
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.client.ClientConfiguration;
+import org.springframework.data.elasticsearch.client.RestClients;
+import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+
+@Configuration
+public class ESConfig extends AbstractElasticsearchConfiguration {
+
+    @Override
+    @Bean
+    public RestHighLevelClient elasticsearchClient() {
+        final ClientConfiguration clientConfiguration = ClientConfiguration
+                .builder()
+                .connectedTo("10.10.10.246:9200")	// 设置ES的地址，端口是9200
+                .build();
+
+        return RestClients.create(clientConfiguration).rest();
+    }
+}
+
+```
+
 
 
 #### 设计实体类
@@ -65,7 +100,7 @@ public class Article {
 
 > * `@Document`用于标注一个实体类
 >   * `indexName`指定索引名
->   * `type`指定索引类型
+>   * ~~`type`指定索引类型~~
 >   * `shards`指定分片数量，默认为5
 >   * `replicas`指定备份数量，默认为1
 > * `@Id`指定一个字段为文档ID
@@ -79,7 +114,7 @@ public class Article {
 
 
 
-#### 使用`ElasticsearchTemplate`创建和删除索引
+#### ~~使用`ElasticsearchTemplate`创建和删除索引~~
 
 ```java
 @SpringBootTest
