@@ -389,3 +389,133 @@ articleRepository.search(nativeSearchQueryBuilder.build());
 >
 > 
 >
+
+
+
+# 解决问题
+
+在导入spring-boot-starter-data-elasticsearch时先到pom.xml中点击 `<artifactId>spring-boot-starter-parent</artifactId>` 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>newdemo</artifactId>
+	<version>0.0.1-SNAPSHOT
+        ...
+```
+
+然后跳到
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-dependencies</artifactId>
+    <version>2.3.1.RELEASE</version>
+  </parent>
+  <artifactId>spring-boot-starter-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>spring-boot-starter-parent</name>
+  <description>Parent pom providing dependency and plugin management for applications built with Maven</description>
+  <properties>
+    <java.version>1.8</java.version>
+    <resource.delimiter>@</resource.delimiter>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+    ...
+```
+
+在点击 `<artifactId>spring-boot-dependencies</artifactId>` 跳到
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-dependencies</artifactId>
+  <version>2.3.1.RELEASE</version>
+  <packaging>pom</packaging>
+  <name>spring-boot-dependencies</name>
+  <description>Spring Boot Dependencies</description>
+  <url>https://spring.io/projects/spring-boot</url>
+  <organization>
+    <name>Pivotal Software, Inc.</name>
+    <url>https://spring.io</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Pivotal</name>
+      <email>info@pivotal.io</email>
+      <organization>Pivotal Software, Inc.</organization>
+      <organizationUrl>https://www.spring.io</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/spring-projects/spring-boot.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/spring-projects/spring-boot.git</developerConnection>
+    <url>https://github.com/spring-projects/spring-boot</url>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/spring-projects/spring-boot/issues</url>
+  </issueManagement>
+  <properties>
+    <activemq.version>5.15.12</activemq.version>
+    <antlr2.version>2.7.7</antlr2.version>
+    <appengine-sdk.version>1.9.80</appengine-sdk.version>
+    <artemis.version>2.12.0</artemis.version>
+    <aspectj.version>1.9.5</aspectj.version>
+    <assertj.version>3.16.1</assertj.version>
+    <atomikos.version>4.0.6</atomikos.version>
+    <awaitility.version>4.0.3</awaitility.version>
+    <bitronix.version>2.1.4</bitronix.version>
+    <build-helper-maven-plugin.version>3.1.0</build-helper-maven-plugin.version>
+    <byte-buddy.version>1.10.11</byte-buddy.version>
+    <caffeine.version>2.8.4</caffeine.version>
+    <cassandra-driver.version>4.6.1</cassandra-driver.version>
+    <classmate.version>1.5.1</classmate.version>
+    <commons-codec.version>1.14</commons-codec.version>
+    <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
+    <commons-lang3.version>3.10</commons-lang3.version>
+    <commons-pool.version>1.6</commons-pool.version>
+    <commons-pool2.version>2.8.0</commons-pool2.version>
+    <couchbase-client.version>3.0.5</couchbase-client.version>
+    <db2-jdbc.version>11.5.0.0</db2-jdbc.version>
+    <dependency-management-plugin.version>1.0.9.RELEASE</dependency-management-plugin.version>
+    <derby.version>10.14.2.0</derby.version>
+    <dropwizard-metrics.version>4.1.9</dropwizard-metrics.version>
+    <ehcache.version>2.10.6</ehcache.version>
+    <ehcache3.version>3.8.1</ehcache3.version>
+    <elasticsearch.version>7.6.2</elasticsearch.version>
+      ...
+```
+
+看到 `<elasticsearch.version>7.6.2</elasticsearch.version>` ，也就是elasticsearch的客户端使用的是7.6.2版本，要么在项目的pom.xml中的`properties` 指定现在用的es客户端的版本（和ES服务的版本一样），要么安装这个版本的ES服务
+
+```xml
+<properties>
+    <java.version>1.8</java.version>
+    <elasticsearch.version>7.8.1</elasticsearch.version>
+</properties>
+```
+
