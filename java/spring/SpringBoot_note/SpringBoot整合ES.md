@@ -93,14 +93,14 @@ public class Article {
     /**
      * 文章的发布日期
      */
-    @Field(name = "publish_date", type = FieldType.Date, format = DateFormat.basic_date)
+    @Field(name = "publish_date", type = FieldType.Date, format = DateFormat.basic_date_time)
     Date publishDate;
 }
 ```
 
 > * `@Document`用于标注一个实体类
 >   * `indexName`指定索引名
->   * ~~`type`指定索引类型~~
+>   * ~~`type`指定索引类型，**这个在高版本中被标记为过时**~~
 >   * `shards`指定分片数量，默认为5
 >   * `replicas`指定备份数量，默认为1
 > * `@Id`指定一个字段为文档ID
