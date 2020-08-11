@@ -207,7 +207,7 @@ cache.leftPush("c1");
 cache.leftPush("c2");
 ```
 
-`redisTemplate.opsFor*()`会返回i一个`*Operations`的对象用于操作该数据类型的对象，这个没有key的约束
+`redisTemplate.opsFor*()`会返回i一个`Bound*Operations`的对象用于操作该数据类型的对象，这个没有key的约束
 
 例如绑定Hash
 
@@ -219,6 +219,29 @@ hashOperations.put("key1", "hashKey1", "obj1");
 API和redis命令大致一样
 
 > 存储对象的时候对象需要实现`Serializable`接口
+
+
+
+可以使用的操作接口如下：
+
+| Interface               | Description                                       |
+| :---------------------- | :------------------------------------------------ |
+| *key类型操作*           |                                                   |
+| `GeoOperations`         | Redis地理空间操作, 例如 `GEOADD`, `GEORADIUS`,…   |
+| `HashOperations`        | Redis hash 操作                                   |
+| `HyperLogLogOperations` | Redis HyperLogLog 操作, 例如 `PFADD`, `PFCOUNT`,… |
+| `ListOperations`        | Redis list 操作                                   |
+| `SetOperations`         | Redis set 操作                                    |
+| `ValueOperations`       | Redis string (或者 value) 操作                    |
+| `ZSetOperations`        | Redis zset (or 有序集合) 操作                     |
+| *key绑定操作*           |                                                   |
+| `BoundGeoOperations`    | Redis key 绑定的geospatial 操作                   |
+| `BoundHashOperations`   | Redis hash key 绑定操作                           |
+| `BoundKeyOperations`    | Redis key 绑定操作                                |
+| `BoundListOperations`   | Redis list key 绑定操作                           |
+| `BoundSetOperations`    | Redis set key 绑定操作                            |
+| `BoundValueOperations`  | Redis string (or value) key 绑定操作              |
+| `BoundZSetOperations`   | Redis zset (or sorted set) key 绑定操作           |
 
 
 
