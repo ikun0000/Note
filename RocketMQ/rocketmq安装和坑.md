@@ -181,7 +181,13 @@
    $ mvn clean package -Dmaven.test.skip=true docker:build
    ```
 
-4. 启动控制台
+4. 定义环境变量，要填IP地址，不能写 `localhost` 或者 `127.0.0.1` ，如果不配置就在启动之后再手动连接
+
+   ```shell
+   export NAMESRV_ADDR=10.10.10.246:9876
+   ```
+   
+5. 启动控制台
 
    ```shell
    $ java -jar target/rocketmq-console-ng-2.0.0.jar
@@ -207,7 +213,7 @@ $ nohup sh bin/mqnamesrv -n 10.10.10.246:9876 &
 
 
 
-### 从其Broker
+### 重启Broker
 
 修改**${ROCKETMQ_HOME}/conf/broker.conf**，在配置项中添加 ` brokerIP1 ` 配置并设置为服务器的公网IP地址：
 
