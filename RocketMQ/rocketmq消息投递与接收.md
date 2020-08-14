@@ -960,7 +960,7 @@ public class FilterConsumer {
 正常启动会出现下面这个异常：
 
 ```
-Exception in thread "main" org.apache.rocketmq.client.exception.MQClientException: CODE: 1  DESC: The broker does not support consumer to filter message by SQL92
+![pay_system_single](C:\Users\kk\Desktop\note\RocketMQ\img\pay_system_single.png)Exception in thread "main" org.apache.rocketmq.client.exception.MQClientException: CODE: 1  DESC: The broker does not support consumer to filter message by SQL92
 ```
 
 那是因为broker没有开启filter，打开**${ROCKETMQ_HOME}/conf/broker.conf**，并添加以下配置：
@@ -975,3 +975,213 @@ enablePropertyFilter=true
 $ nohup sh bin/mqbroker -n 10.10.10.246:9876 -c conf/broker.conf autoCreateTopicEnable=true &
 ```
 
+
+
+## 分布式事务与事务消息
+
+
+
+### 分布式事务
+
+首先有一个支付系统，在用户支付完成后会提交支付订单到支付订单数据库中，然后再计算手续费并把手续费提交到手续费数据库中：
+
+![](./img/pay_system_single.png)
+
+由于支付订单和对应的手续费是要一起出现的，所以只需要开启一个事务即可：
+
+```java
+// 开启支付模块事务
+// 开启手续费事务
+try {
+    // 提交支付订单
+    // 计算手续费
+    // 提交手续费
+} catch (Exception e) {
+    // 回滚支付订单事务
+    // 回滚手续费事务
+} 
+```
+
+在但应用中并不是什么问题，但是手续费计算不是要求立即计算出来的，所以我们把支付模块和手续费计算模块分割成两个微服务：
+
+![](./img/pay_system.png)
+
+此时问题就出现了：
+
+在这个架构中，每一步都可能失败，如果没有处理好就会导致支付订单和手续费不一致，有可能是支付订单更新了手续费没有更新，也有可能是手续费更新了但支付订单没有更新。如果没有处理话导致坏账就等着被财务砍死吧！
+
+对于手续费系统来说比较简单，如果消费消息失败则可以让支付系统重发即可，最大的问题就在于无法保证更新本地事务和发送消息的一致性，即无法保证更新订单成功后发送消息一定成功或者发送消息成功但是更新订单一定成功。无论是先更新订单还是先发送消息都无法保证。
+
+如果我们先发送消息：
+
+![](./img/send_message_first.png)
+
+如果先发送消息在更新本地事务会怎么样能，假如第一步发送消息成功，但是第二步更新订单失败产生了事务回滚，那么第一步发送的消息是不能撤回的，此时手续费已经消费了消息并提交了手续费，那么就导致了手续费被更新了但订单没被更新。
+
+如果反过来：
+
+![](./img/commit_transaction_first.png)
+
+我们先执行本地事务再提交支付成功消息，代码结构可这样：
+
+```java
+// 开启支付订单事务
+try {
+    // 提交支付订单事务
+    // 提交事务
+} catch (Exception) {
+    // 回滚支付订单事务
+}
+// 发送支付成功消息
+```
+
+如果这样写代码那如果消息发送失败就没办法回滚事务了，这个也很好解决：
+
+```java
+// 开启支付订单事务
+try {
+    // 提交支付订单事务
+    // 发送支付成功消息
+    // 提交事务
+} catch (Exception) {
+    // 回滚支付订单事务
+}
+```
+
+只需要把发送支付成功消息放到try块里面执行就好了，这看似没什么问题，但是如果因为网路抖动导致支付系统没有接收到MQ的响应，从而导致支付系统认为发送消息失败并回滚了本地事务。此时手续费计算系统已经消费消息并写入到手续费数据库了，这又导致了不一致。
+
+
+
+### 事务消息
+
+RocketMQ提供事务消息实现分布式事务，保证了要么本地事务和发送消息同时成功或同时失败
+
+![](./img/transaction_message.png)
+
+具体做法是首先producer先发送一个half消息到RocketMQ中，通知其开启一个事务，这个half消息并不是不完整的消息。half消息和普通消息不同在于在事务提交之前这个half消息对于consumer来说这不可见的，consumer无法消费这个消息。在half消息发送成功之后就可以执行本地事务，根据事务执行的结果决定是否提交事务消息。如果事务提交成功，则发送确认消息到RocketMQ，此时consumer就可以消费这条消息了。如果事务回滚了，那么发送回滚消息到RocketMQ，RocketMQ就会删除这条消息，consumer也就没有办法消费这条消息。这样就解决了一致性问题了。
+
+> RocketMQ实现consumer不可见也很简单：如果消息是half消息，将备份原消息的主题与消息消费队列，然后改变主题为RMQ_SYS_TRANS_HALF_TOPIC。由于消费组未订阅该主题，故消费端无法消费half类型的消息，然后RocketMQ会开启一个定时任务，从Topic为RMQ_SYS_TRANS_HALF_TOPIC中拉取消息进行消费，根据生产者组获取一个服务提供者发送回查事务状态请求，根据事务状态来决定是提交或回滚消息。
+
+对于以上做法中，如果食物消息提交或回滚失败了怎么办？对于这个问题，RocketMQ提供了事务反查机制，需要注册一个消息反查接口用于反查本地事务状态。如果RocketMQ没有收到提交或回滚请求就会定期反查，然后根据反查结果确定提交还是回滚。
+
+RocketMQ执行事务消息的流程如下：
+
+![](./img/transaction_message_step.png)
+
+
+
+具体的Producer如下，Consumer方不变：
+
+```java
+package org.example.transaction;
+
+import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.TransactionListener;
+import org.apache.rocketmq.client.producer.TransactionMQProducer;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.common.RemotingHelper;
+
+import java.util.concurrent.*;
+
+public class TransactionProducer {
+
+    public static void main(String[] args) throws Exception {
+        // 初始化事务生产者
+        TransactionMQProducer producer = new TransactionMQProducer("GroupA");
+        producer.setNamesrvAddr("10.10.10.246:9876");
+        // 给事务生产者提供的线程池
+        ExecutorService executorService = new ThreadPoolExecutor(2,
+                5,
+                100,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(2000),
+                new ThreadFactory() {
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread thread = new Thread(r);
+                        thread.setName("client-transaction-msg-check-thread");
+                        return thread;
+                    }
+                });
+        producer.setExecutorService(executorService);
+
+        // 初始化该事务消息对应的本地事务和本地事务反查对象
+        TransactionListener transactionListener = new TransactionListenerImpl();
+        producer.setTransactionListener(transactionListener);
+
+        producer.start();
+
+        Message successMessage = new Message("TopicA",  "TagA", "Success".getBytes(RemotingHelper.DEFAULT_CHARSET));
+        Message failureMessage = new Message("TopicA", "TagA", "Failure".getBytes(RemotingHelper.DEFAULT_CHARSET));
+
+        // 把消息发送到事务里
+        SendResult sendResult1 = producer.sendMessageInTransaction(successMessage, Integer.parseInt("1"));
+        SendResult sendResult2 = producer.sendMessageInTransaction(failureMessage, null);
+
+        System.out.printf("Success Message: %s%n", sendResult1.getSendStatus());
+        System.out.printf("Failure Message: %s%n", sendResult2.getSendStatus());
+
+        producer.shutdown();
+    }
+
+}
+
+```
+
+执行事务消息需要 `TransactionMQProducer` 实例并给唯一的生产组名。然后就可以提供一个线程池给 `TransactionMQProducer` 处理检查请求i。
+
+然后需要提供 `TransactionListener` 来执行本地事务和反查方法：
+
+```java
+package org.example.transaction;
+
+import org.apache.rocketmq.client.producer.LocalTransactionState;
+import org.apache.rocketmq.client.producer.TransactionListener;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageExt;
+
+public class TransactionListenerImpl implements TransactionListener {
+
+    // 这个方法就是执行本地事务的
+    // 这个方法会在调用sendMessageInTransaction之后执行
+    @Override
+    public LocalTransactionState executeLocalTransaction(Message msg, Object arg) {
+        if (arg == null) {
+            return LocalTransactionState.ROLLBACK_MESSAGE;
+        }
+        return LocalTransactionState.COMMIT_MESSAGE;
+    }
+
+    // 这个方法是反查本地事务状态，根据本地事务状态提交或回滚事务消息
+    @Override
+    public LocalTransactionState checkLocalTransaction(MessageExt msg) {
+        return LocalTransactionState.COMMIT_MESSAGE;
+    }
+}
+
+```
+
+`executeLocalTransaction` 为提交half消息成功后执行本地事务的方法，并根据本地事务执行结果返回事务消息状态。
+
+事务消息共有三种状态，提交状态、回滚状态、中间状态：
+
+- TransactionStatus.CommitTransaction: 提交事务，它允许消费者消费此消息。
+- TransactionStatus.RollbackTransaction: 回滚事务，它代表该消息将被删除，不允许被消费。
+- TransactionStatus.Unknown: 中间状态，它代表需要检查消息队列来确定状态。
+
+`checkLocalTransaction` 用于检查消息对应的本地事务状态并返回事务消息状态。
+
+`Message` 和 `MessageExt` 可以调用 `getTransactionId` 方法获取这个消息的事务ID。
+
+在提供好 `TransactionListener` 之后和发送普通消息差不多，但是发送消息的方法不是 `send` 而是 `sendMessageInTransaction` ，`sendMessageInTransaction` 的第二个参数会传递给 `executeLocalTransaction` 的第二个参数。之后的事就由rocketmq-client来完成了。
+
+
+
+### 事务消息使用上的限制
+
+1. 事务消息不支持延时消息和批量消息。
+2. 为了避免单个消息被检查太多次而导致半队列消息累积，我们默认将单个消息的检查次数限制为 15 次，但是用户可以通过 Broker 配置文件的 `transactionCheckMax`参数来修改此限制。如果已经检查某条消息超过 N 次的话（ N = `transactionCheckMax` ） 则 Broker 将丢弃此消息，并在默认情况下同时打印错误日志。用户可以通过重写 `AbstractTransactionalMessageCheckListener` 类来修改这个行为。
+3. 事务消息将在 Broker 配置文件中的参数 transactionTimeout 这样的特定时间长度之后被检查。当发送事务消息时，用户还可以通过设置用户属性 CHECK_IMMUNITY_TIME_IN_SECONDS 来改变这个限制，该参数优先于 `transactionTimeout` 参数。
+4. 事务性消息可能不止一次被检查或消费。
+5. 提交给用户的目标主题消息可能会失败，目前这依日志的记录而定。它的高可用性通过 RocketMQ 本身的高可用性机制来保证，如果希望确保事务消息不丢失、并且事务完整性得到保证，建议使用同步的双重写入机制。
+6. 事务消息的生产者 ID 不能与其他类型消息的生产者 ID 共享。与其他类型的消息不同，事务消息允许反向查询、MQ服务器能通过它们的生产者 ID 查询到消费者。
