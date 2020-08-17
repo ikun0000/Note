@@ -15,7 +15,7 @@
 2. 启动neo4j
 
    ```shell
-   $ docker run -dit -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data neo4j
+   $ docker run -dit --name neo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data neo4j
    ```
 
    此时可以访问**http://neo4jhost:7474**的web界面控制台了
