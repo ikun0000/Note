@@ -1,6 +1,12 @@
 # ES基础
 
+
+
 ## ElasticSearch安装
+
+
+
+### docker
 
 ```shell
 docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:tag
@@ -61,6 +67,35 @@ http.cors.allow-origin: "*"
 ```
 
 最后打开浏览器访问Sense: `http://localhost:5601/app/sense` 
+
+用docker安装elasticsearch之后最好使用docker安装kibana和sense
+
+```shell
+$ docker pull kibana:tag
+```
+
+其中tag和elasticsearch版本一致
+
+```shell
+$ docker run -dit --name kibana -e ELASTICSEARCH_URL=http://10.10.10.246:9200 -p 5601:5601 kibana:tag
+```
+
+然后可能还要修改kibana.yml
+
+```shell
+$ docker cp kibana:/usr/share/kibana/config/kibana.yml ./
+$ vim kibana.yml
+# 修改
+# elasticsearch.hosts: ["http://es的地址:9200"]
+$ docker cp kibana.yml kibana:/usr/share/kibana/config/kibana.yml
+$ docker restart kibana
+```
+
+访问`http://kibana的地址:5601`
+
+### 普通安装
+
+[安装并运行 Elasticsearch]( https://www.elastic.co/guide/cn/elasticsearch/guide/current/running-elasticsearch.html )
 
 
 
