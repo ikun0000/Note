@@ -232,3 +232,23 @@ try {
 
 
 
+## IDEA识别Maven项目卡死
+
+IDEA在识别Mave项目时卡死，包括使用Spring项目生成器生成项目后卡死，右下角一直显示 `Reading Maven project` ，但是一点没动
+
+解决方法：
+
+找到 `C:\Windows\System32\Driver\etc\host` 
+
+把 `127.0.0.1 localhost` 的注释去掉
+
+把 `::1 localhost` 的注释去掉
+
+以管理员的身份打开cmd，执行
+
+```powershell
+netsh winsock reset
+```
+
+然后重启，再次导入会没问题了
+
