@@ -12,10 +12,37 @@
 
 ### 安装
 
+如果之前有安装过docker，那么先卸载旧版的docker
+
 ```shell
-$ yum install docker -y 
-$ systemctl enable docker
-$ systemctl start docker 
+$ yum remove docker \
+                docker-client \
+                docker-client-latest \
+                docker-common \
+                docker-latest \
+                docker-latest-logrotate \
+                docker-logrotate \
+                docker-engine
+```
+
+然后设置repository
+
+```shell
+$ yum install -y yum-utils
+$ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+最后安装
+
+```shell
+$ yum install docker-ce docker-ce-cli containerd.io
+```
+
+启动docker并且设置开机启动
+
+```shell
+$ systemctl enable docker.service
+$ systemctl start docker.service
 ```
 
 
