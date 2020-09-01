@@ -7,10 +7,16 @@
 > [W3Cschool](https://www.w3cschool.cn/docker/docker-tutorial.html)
 >
 > [RUNOOB](https://www.runoob.com/docker/docker-tutorial.html)
+>
+> [Docker命令](https://docs.docker.com/reference/)
+>
+> [Docker Get Started](https://docs.docker.com/get-started/)
+>
+> [Docker Install](https://docs.docker.com/engine/install/)
 
 
 
-### 安装
+## 安装
 
 如果之前有安装过docker，那么先卸载旧版的docker
 
@@ -45,22 +51,28 @@ $ systemctl enable docker.service
 $ systemctl start docker.service
 ```
 
+验证
+
+```shell
+$ docker version 		# 显示版本信息
+$ docker info			# 显示docker的配置信息
+$ docker help			# 显示docker的帮助
+```
 
 
-### 导出/导入镜像
+
+## 导出/导入镜像
 
 ```shell
 # 导出镜像到tar.gz
-$ docker  save nginx >/tmp/nginx.tar.gz
+$ docker save nginx >/tmp/nginx.tar.gz
 # 从tar.gz导入镜像
 $ docker load < /tmp/nginx.tar.gz
 ```
 
 
 
-
-
-#### docker基础
+## docker基础
 
 运行一个容器：
 
@@ -121,7 +133,7 @@ $ docker stop 2b1b7a428627c5         //可以是容器ID或者是容器名称（
 
 
 
-#### 使用容器
+## 使用容器
 
 用Python Flask运行web应用：
 
@@ -149,6 +161,34 @@ $ docker run -d -p 5000:5000 training/webapp python app.py
 
 -p <本地端口>:<容器的服务端口>
 
+格式：
+
+```
+ip:hostPort:containerPort
+ip::containerPort
+hostPort:containerPort
+containerPort
+```
+
+-i 以交互式方式运行容器，通常与-t一起使用
+
+-t 为容器重新分配一个伪输入终端，通常与-i一同使用
+
+-P 随机端口映射
+
+--name="容器的名字" 为容器指定一个名称
+
+-d 后台运行容器，并返回容器ID，也即启动守护容器
+
+
+
+启动一个centos7容器并且以交互式进入
+
+```shell
+[root@localhost etc]# docker run -it centos:7
+[root@5d4e2f820c4d /]#
+```
+
 
 
 ```shell
@@ -160,12 +200,12 @@ $ docker port <容器ID或者容器名>
 
 
 ```shell
-$ docker logs -f <容器ID或者容器名>
+$ docker logs -f -t --tail <容器ID或者容器名>
 $ docker top <容器ID或者容器名>
-$ docker inspect <容器ID或者容器名>
+$ docker inspect <容器ID或者容器名,数据卷等任何docker对象>
 ```
 
--f 的作用是让docker logs使用像tail -f的命令输出方式
+-f 的作用是让docker logs使用像tail -f的命令输出方式，也就是跟随着日志更新而更新，-t显示时间戳，--tail从日志末尾显示多少行，默认为“all”，也就是全部行
 
 第二条命令用来查看容器内运行的进程
 
@@ -178,7 +218,15 @@ $ docker inspect <容器ID或者容器名>
 ```shell
 $ docker start <容器名或者容器ID>
 $ docker stop <容器名或者容器ID>
+$ docker kill <容器名或者容器ID>	# 强制停止容器
 ```
+
+
+
+退出容器（在容器里面）：
+
+* ~~exit 容器停止并退出~~
+* ~~ctrl + P + Q 容器不停止退出~~
 
 
 
@@ -193,12 +241,34 @@ $ docker rm <容器名或者容器ID>
 $ docker rm -f <容器名或者容器ID>
 ```
 
+强制移除所有容器：
+
+```shell
+$ docker rm -f $(docker ps -a -q)
+```
+
 
 
 进入容器：
 
 ```shell
-$ docker exec -it <容器名或ID>  /bin/bash
+$ docker exec -it <容器名或ID> /bin/bash		# 这对容器执行命令并返回结果，-it则以交互式产生一个伪终端，/bin/bash则执行一个shell
+$ docker attach <容器名或者容器ID>				# 直接进入容器设置好的目录
+```
+
+区别：
+
+* attach：直接进入容器启动命令的终端，不会启动新进程
+* exec：是在容器中打开新的终端，并且可以启动新进程
+
+
+
+不进入容器并并在容器中执行命令
+
+```shell
+[root@localhost ~]# docker exec -t hopeful_lehmann ls -a
+.   .dockerenv         bin  etc   lib    media  opt   root  sbin  sys  usr
+..  anaconda-post.log  dev  home  lib64  mnt    proc  run   srv   tmp  var
 ```
 
 
@@ -211,12 +281,41 @@ $ docker rename <旧的容器名称> <新的容器名称>
 
 
 
-#### 使用镜像
+查看正在运行的容器：
+
+```shell
+$ docker ps
+```
+
+-a 显示所有容器，默认只显示正在运行的
+
+-n [int] 显示最后创建的几个容器，默认-1，就是显示全部
+
+-q 只显示容器ID
+
+-l 显示最后创建的容器
+
+
+
+拷贝容器中的数据到宿主机上/拷贝宿主机的数据到容器中：
+
+```shell
+$ docker cp <容器ID>:<容器路径> <宿主机目录>
+$ docker cp <宿主机目录> <容器ID>:<容器路径>
+```
+
+
+
+## 使用镜像
 
 查看本地镜像：
 
 ```shell
 $ docker images
+$ docker images --all		# 显示所有镜像
+$ docker images -q			# 只显示镜像的ID
+$ docker images --digests	# 显示镜像的数字签名
+$ docker images --no-trunc	# 输出详细信息,不截断内容
 ```
 
 
@@ -251,22 +350,34 @@ $ docker push <你自己的镜像>
 搜索镜像：
 
 ```shell
-$ docker search httpd
+$ docker search httpd				# 搜索httpd的镜像
+$ docker search --no-trunc nginx	# 索索nginx镜像并显示详细的DESCRIPTION信息
+$ docker search --limit 10 nginx	# 搜索nginx镜像并只显示前10个
 ```
 
 
 
-##### 创建镜像
+## 创建镜像
 
-###### 更新镜像：
+### 更新镜像：
 
 1. 首先用镜像创建一个容器：`# docker run -t -i ubuntu:15.10 /bin/bash`
 2. 在这个ubuntu里面更新（apt update）：`# apt update`
 3. 然后生成新的镜像（docker commit -m="说明信息" -a="镜像作者" <容器ID> <生成的路径>）：`# docker commit -m="has update" -a="ikun" 34a46bc8d97 test/test:v1`
 
+commit 提交一个容器副本使之称为一个新的镜像
+
+```shell
+$ docker commit -m="has update" -a="ikun" 34a46bc8d97 test/test:v1`
+```
+
+-m 提交信息
+
+-a 镜像作者
 
 
-###### 构建镜像：
+
+### 构建镜像：
 
 1. 首先创建Dockerfile文件，里面包含docker如何创建镜像
 
@@ -295,7 +406,7 @@ $ docker search httpd
 
 
 
-##### 设置镜像标签：
+### 设置镜像标签：
 
 ```shell
 $ docker tag f1a24979af43 youj/centos:6.7
@@ -303,17 +414,18 @@ $ docker tag f1a24979af43 youj/centos:6.7
 
 
 
-##### 删除镜像：
+### 删除镜像：
 
 ```shell
-$ docker rmi -f <镜像名>
+$ docker rmi -f <镜像名...>
+$ docker rmi -f $(docker images -qa)	# 删除所有镜像
 ```
 
 -f 表示强制删除，同时删除容器
 
 
 
-#### 连接容器
+## 连接容器
 
 网路端口映射：
 
@@ -374,7 +486,7 @@ $ docker kill -s <信号> <容器ID或者容器名>
 
 
 
-##### DockerFile
+## DockerFile
 
 ```dockerfile
 FROM	centos:6.7
@@ -430,14 +542,123 @@ DockerFile语法：
 | USER       | 指定用户                                                     |
 | VOLUME     | 容器数据卷，用于数据保存和持久化工作                         |
 | ONBUILD | 当构建一个被继承的Dockerfile时运行的命令，父镜像在被子镜像继承后父镜像的onbuild会被触发 |
-##### Volume
+从Dockerfile构建Docker镜像
+
+```shell
+$ docker build -f /path/to/a/Dockerfile .
+$ docker build -f /path/to/a/Dockerfile -t aa/bb:tag .	# 构建image并使用-t后的名字和tag
+```
+
+
+
+## 数据卷
+
+```shell
+$ docker run -d -v /usr/share/nginx/html nginx		# 目录使rw
+$ docker run -d -v /usr/share/nginx/html:rw nginx	# 容器目录读写
+$ docker run -d -v /usr/share/nginx/html:ro nginx	# 容器目录只读（容器内只读，宿主机可读可写）
+```
+
+运行nginx镜像并把容器内部/usr/share/nginx/html挂在到宿主机（使用docker inspect 可以查看（Mounts）），也可以 -v 宿主目录或者volume名:容器目录:权限，最后带上对容器的权限
+
+查看数据卷挂载
+
+```shell
+$ docker inspect mycentos
+[
+    {
+        "Id": "a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c",
+        "Created": "2020-09-01T06:41:55.256481975Z",
+        "Path": "/bin/bash",
+        "Args": [],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 1942,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2020-09-01T06:41:55.506891591Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:7e6257c9f8d8d4cdff5e155f196d67150b871bbe8c02761026f803a704acb3e9",
+        "ResolvConfPath": "/var/lib/docker/containers/a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c/hostname",
+        "HostsPath": "/var/lib/docker/containers/a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c/hosts",
+        "LogPath": "/var/lib/docker/containers/a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c/a9417e53d442dd5b052f1119f247ca583f11ddc00ca634f4bf10ef9ae59aa07c-json.log",
+        "Name": "/mycentos",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/test:/test"
+            ],
+...
+```
+
+
+
+创建容器卷：
 
 ```
-# docker run -d -v /usr/share/nginx/html nginx
-# docker run -d -v /usr/share/nginx/html:ro nginx
+[root@localhost myDocker]# docker volume create --name v1
+v1
 ```
 
-运行nginx镜像并把容器内部/usr/share/nginx/html挂在到宿主机（使用docker inspect 可以查看（Mounts）），也可以 -v 宿主目录:容器目录，最后带上对容器的权限
+--name 指定容器卷名称
+
+
+
+查看所有容器数据卷映射：
+
+```
+[root@localhost myDocker]# docker volume ls
+DRIVER              VOLUME NAME
+local               03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3
+local               55bb9e73da146cbdcc11435c4dcf82cc3abaf4aa725bad66c4dce6dac4d0eb45
+root@localhost myDocker]# docker volume inspect 03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3
+[
+    {
+        "CreatedAt": "2020-09-01T15:20:58+08:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3/_data",
+        "Name": "03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+[root@localhost myDocker]# docker volume inspect 03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3
+[
+    {
+        "CreatedAt": "2020-09-01T15:20:58+08:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3/_data",
+        "Name": "03c9c0404cb6246f7ba72116641279bcd53df80d14055f4bfd268c67412171d3",
+        "Options": null,
+        "Scope": "local"
+    }
+]
+```
+
+
+
+删除数据卷：
+
+```shell
+$ docker volume rm v1
+```
+
+-f 强制删除
 
 
 
@@ -457,7 +678,33 @@ $ docker run -it --volume-from data_container ubuntu /bin/bash
 
 
 
-### Docker网路
+显示容器中文件的更改情况：
+
+```shell
+$ docker diff <容器名或容器ID>
+```
+
+| Symbol | Description                     |
+| :----- | :------------------------------ |
+| `A`    | A file or directory was added   |
+| `D`    | A file or directory was deleted |
+| `C`    | A file or directory was changed |
+
+
+
+从别的镜像上挂载数据卷：
+
+```shell
+$ docker run -dit --name dc01 -v /data1:data1 -v /data2:/data2 test/test:v1
+$ docker run -dit --name dc02 --volumes-from dc01 test/test:v1
+$ docker run -dit --name dc03 --volumes-from dc01 /data1:data1 -v /data2:/data2 test/test:v1
+```
+
+dc02和dc03的数据卷和dc01挂在到宿主机的目录一样，要求必须是同一个镜像生成的容器，宿主的数据卷可以实现在多个实例中共享文件，删除一个实例不会影响到共享，除非所有实例都被删除
+
+
+
+## Docker网络
 
 获取Docker网路配置
 
@@ -489,7 +736,7 @@ $ docker network create test_net
 
 
 
-# 问题
+## 问题
 
 ```shell
 [root@localhost ~]# docker exec -it /bin/bash some-mysql
