@@ -13,6 +13,8 @@
 > [Docker Get Started](https://docs.docker.com/get-started/)
 >
 > [Docker Install](https://docs.docker.com/engine/install/)
+>
+> [Dockerfile参考](https://docs.docker.com/engine/reference/builder/)
 
 
 
@@ -531,9 +533,9 @@ DockerFile语法：
 | ---------- | ------------------------------------------------------------ |
 | FROM       | 基础镜像，当前新镜像是基于哪个镜像                           |
 | RUN        | 容器构建时需要运行的命令                                     |
-| COPY       | 类似AD，拷贝文件和目录到镜像中                               |
-| ADD        | 将宿主主机目录下的文件拷贝进镜像且ADD命令会自动处理RUL和解压tar压缩包 |
-| CMD        | 指定一个容器启动时要运行的命令。Dockerfile中可以有多个CMD命令，但只有最后一个生效，CMD会被docker run之后的参数替换 |
+| COPY       | 类似ADD，拷贝文件和目录到镜像中，格式：`COPY src dst` 或者 `COPY ["src", "dst"]` |
+| ADD        | 将宿主主机目录下的文件拷贝进镜像且ADD命令会自动处理URL和解压tar压缩包 |
+| CMD        | 指定一个容器启动时要运行的命令。Dockerfile中可以有多个CMD命令，**但只有最后一个生效**，CMD会被docker run之后的参数替换（也就是相当于他会在Dockerfile最后加上一个 `CMD 你docker run 后的命令`），格式：`CMD <命令>` 或者 `CMD ["命令", "参数1", "参数2", ...]`。`CMD ["参数1", "参数2", ...]` 在指定 `ENTRYPOINT` 指令后 `CMD` 指定具体参数 |
 | EXPOSE     | 当前容器对外暴露出的端口                                     |
 | WORKDIR    | 指定在容器创建后，终端登录进来的工作目录                     |
 | MAINTAINER | 镜像的维护者的姓名和邮箱                                     |
@@ -548,6 +550,27 @@ DockerFile语法：
 $ docker build -f /path/to/a/Dockerfile .
 $ docker build -f /path/to/a/Dockerfile -t aa/bb:tag .	# 构建image并使用-t后的名字和tag
 ```
+
+查看镜像的变更历史：
+
+```
+[root@localhost ~]# docker history mycentos:v1 
+IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
+d1c1907306d4        5 minutes ago       /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "/bin…   0B                  
+202ad485c3f8        5 minutes ago       /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "echo…   0B                  
+70c47798b8f6        5 minutes ago       /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "echo…   0B                  
+98d957c520ea        5 minutes ago       /bin/sh -c #(nop)  EXPOSE 80                    0B                  
+520550ccb8e8        5 minutes ago       /bin/sh -c yum -y install net-tools             92.3MB              
+de5be8ff7aa3        5 minutes ago       /bin/sh -c yum -y install vim                   147MB               
+1278995a177c        6 minutes ago       /bin/sh -c #(nop) WORKDIR /tmp                  0B                  
+26122d69c95b        6 minutes ago       /bin/sh -c #(nop)  ENV LOGIN_PATH=/tmp          0B                  
+d0619cd97171        6 minutes ago       /bin/sh -c #(nop)  MAINTAINER ikun0000<20662…   0B                  
+7e6257c9f8d8        3 weeks ago         /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B                  
+<missing>           3 weeks ago         /bin/sh -c #(nop)  LABEL org.label-schema.sc…   0B                  
+<missing>           3 weeks ago         /bin/sh -c #(nop) ADD file:61908381d3142ffba…   203MB
+```
+
+
 
 
 
