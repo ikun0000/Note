@@ -6,10 +6,6 @@
 
 
 
-![](./img/vim2.png)
-
-
-
 ## vim使用方法
 
 ### text object
