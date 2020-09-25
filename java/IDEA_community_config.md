@@ -252,3 +252,18 @@ netsh winsock reset
 
 然后重启，再次导入会没问题了
 
+
+
+## IDEA无法显示Project中的src目录
+
+使用SpringBoot初始化器初始化项目后IDEA中project栏中没有src目录。
+
+解决方法：
+
+关闭IDEA，删除项目的打开记录
+
+然后去到项目所在的目录
+
+把 `.idea` 目录删除
+
+打开IDEA并重新导入这个项目
