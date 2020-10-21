@@ -70,3 +70,5 @@ task clean(type: Delete) {
 ```
 
 然后重新加载
+
+选择File -> Sync Project With Gradle Files
