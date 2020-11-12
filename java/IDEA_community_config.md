@@ -29,6 +29,11 @@
 | codehelper.generator               | 代码生成                                                     |
 | **redis simple**                   | **Redis Mongodb简单管理，查看数据，清除所有数据和编辑数据，需要自行安装redis-cli并指定，在Settings -> Other Setting -> Nosql Servers中设置** |
 | ideaVim                            | IdeaVim支持许多Vim功能，包括正常/插入/可视模式，运动键，删除/更改，标记，寄存器，一些Ex命令，Vim正则表达式，通过〜/ .ideavimrc配置，宏，窗口命令等 |
+| **Indent Rainbow**                 | **缩进显示色块**                                             |
+| **Toml**                           | **TOML语言格式支持**                                         |
+| leetcode editor                    | leetcode刷题                                                 |
+| Material Theme UI                  | 将原始外观改成Material Design外观                            |
+| Codota                             | 根据代码上下文补全                                           |
 
 ## Settings配置
 
