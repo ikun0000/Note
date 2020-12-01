@@ -34,6 +34,7 @@
 | leetcode editor                    | leetcode刷题                                                 |
 | Material Theme UI                  | 将原始外观改成Material Design外观                            |
 | Codota                             | 根据代码上下文补全                                           |
+| **Properties to YAML Converter**   | **把properties文件转化为YAML文件**                           |
 
 ## Settings配置
 
