@@ -553,6 +553,13 @@ public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws E
     <artifactId>jjwt</artifactId>
     <version>0.9.1</version>
 </dependency>
+
+<!-- 使用JJWT生成令牌的时候一定要加上，否则会抛出ClassNotFoundException-->
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.0</version>
+</dependency>
 ```
 
 ```java
