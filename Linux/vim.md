@@ -272,6 +272,19 @@ endfun
 
 
 
+在normal和visual模式下使用 `,y` 和 `,p` 赋值粘贴剪切板内容
+
+```
+let mapleader=','			" 设置leader
+nnoremap <leader>y "+yy		" 设置执行 <leader>y 等于执行 "+yy
+nnoremap <leader>p "+p		" 和上面的思路一样
+
+vnoremap <leader>y "+y
+vnoremap <leader>p "+p
+```
+
+
+
 ### VIM映射
 
 #### 基本映射
