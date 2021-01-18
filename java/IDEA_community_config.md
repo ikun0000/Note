@@ -35,6 +35,7 @@
 | Material Theme UI                  | 将原始外观改成Material Design外观                            |
 | Codota                             | 根据代码上下文补全                                           |
 | **Properties to YAML Converter**   | **把properties文件转化为YAML文件**                           |
+| Protocal Buffer Editor             | Google protobuf文件编写支持                                  |
 
 ## Settings配置
 
