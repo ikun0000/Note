@@ -1,0 +1,11 @@
+// 使用protoc程序根据proto文件生成对应的类
+// protoc --java_out=. Student.proto
+
+syntax = "proto3";    // 版本
+option java_outer_classname = "StudentOuter";    // 生成的Java外部类名，也是文件名
+
+// protobuf使用message管理数据
+message Student {     // 会在StudentOuter内部生成一个Student内部类，这个也是真正发送的对象
+  int32 id = 1;       // Student的一个属性，属性名为id，类型为int32（protobuf类型）属性序号为1
+  string name = 2;    // 和上面的属性一样
+}

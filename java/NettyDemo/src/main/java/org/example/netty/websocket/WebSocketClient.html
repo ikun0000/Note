@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container-fluid" id="app">
+
+        <div class="col-md-6">
+
+            <div style="height: 100px;"></div>
+
+            <form>
+                <label for="basic-url">Enter your message: </label>
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon3"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></span>
+                    <input v-model="msg" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                </div>
+                <br>
+                <button type="button" @click="send" class="btn btn-success">Send</button>
+            </form>
+
+        </div>
+
+        <div class="col-md-6">
+            <div style="height: 100px;"></div>
+
+            <p v-for="(item,index) in respMsg" :key="index" class="bg-info">{{ item }}</p>
+        </div>
+
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: "",
+                respMsg: [],
+                socket: null
+            },
+            mounted: function() {
+                // 判断浏览器是否支持WebSocket
+                if (!window.WebSocket) {
+                    alert("Current browser unsupport WebSocket!")
+                    return
+                }
+                
+                // 连接到WebSocket服务器
+                this.socket = new WebSocket("ws://localhost:7070/hello")
+                var self = this
+                // 当受到服务器消息时触发
+                this.socket.onmessage = function(env) {
+                    self.respMsg.push(env.data)
+                }
+
+                // 当连接建立时触发
+                this.socket.onopen = function(env) {
+                    console.log("connected to ws://localhost:7070/hello")
+                }
+
+                // 当连接关闭时触发
+                this.socket.onclose = function(env) {
+                    console.log("connection closed!")
+                    self.socket = null
+                }
+            },
+            methods: {
+                send() {
+                    // 判断socket是否创建成功并且socket状态是否是开启的
+                    if (!this.socket) {
+                        return
+                    }
+                    if (this.socket.readyState != WebSocket.OPEN) {
+                        alert("unconnect!")
+                        return
+                    }
+
+                    this.socket.send(this.msg)
+                    this.msg = ""
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

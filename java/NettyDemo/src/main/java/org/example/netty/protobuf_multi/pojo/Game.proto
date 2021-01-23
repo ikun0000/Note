@@ -1,0 +1,31 @@
+syntax = "proto3";
+option optimize_for = SPEED;    // 加快解析
+option java_package = "org.example.netty.protobuf_multi.pojo";    // 设置生成的包
+option java_outer_classname = "GameOuter";
+
+// protobuf 支持使用message管理其他的message
+message Game {
+  // 定义一个枚举类型
+  enum DataType {
+    Upload = 0;     // 必须从0开始编号
+    Download = 1;
+  }
+
+  // 用DATaType标识传入的哪个message类型
+  DataType data_type = 1; // 这个1是代表在Game的第一个属性
+  // 表示每次枚举类型最多只能出现其中一个
+  oneof dataBody {
+    Upload upload = 2;
+    Download download = 3;
+  }
+}
+
+message Upload {
+  int32 id = 1;
+  string filename = 2;
+}
+
+message Download {
+  string filename = 1;
+  int32 size = 2;
+}
