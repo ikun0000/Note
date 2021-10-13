@@ -1,0 +1,1 @@
+cmd_/root/linux-5.14.3/drivers/helloDev/helloDev.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000  --build-id  -T ./scripts/module-common.lds -o /root/linux-5.14.3/drivers/helloDev/helloDev.ko /root/linux-5.14.3/drivers/helloDev/helloDev.o /root/linux-5.14.3/drivers/helloDev/helloDev.mod.o;  true
