@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: provider
+  output:
+    ansi:
+      enabled: ALWAYS
+  cloud:
+    nacos:
+      discovery:
+        username: nacos
+        password: nacos
+        server-addr: http://localhost:8848
+        namespace: public
+
+dubbo:
+  application:
+    name: echo-provider
+    id: echo-provider
+  registry:
+    address: nacos://127.0.0.1:8848
+    username: nacos
+    password: nacos
+  config-center:
+    address: nacos://127.0.0.1:8848
+  metadata-report:
+    address: nacos://127.0.0.1:8848
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: -1
+  scan:
+    base-packages:
+      - com.example.demo.service
+  cloud:
+    subscribed-services: provider
+
+server:
+  port: 8082

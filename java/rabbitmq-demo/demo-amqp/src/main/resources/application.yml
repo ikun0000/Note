@@ -1,0 +1,14 @@
+
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  rabbitmq:
+    host: 10.10.10.224
+    port: 5672
+    username: guest
+    password: guest
+
+logging:
+  logback
